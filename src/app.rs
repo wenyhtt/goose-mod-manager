@@ -1,7 +1,7 @@
-use eframe::egui::{self, Frame, Margin, Vec2};
 use crate::models::{ModEntry, SortOption, Tab};
 use crate::theme::{BG_DARK, TEXT_WHITE};
 use crate::ui;
+use eframe::egui::{self, Frame, Margin, Vec2};
 
 pub struct GooseModManager {
     pub active_tab: Tab,
@@ -68,7 +68,6 @@ impl GooseModManager {
         let end = (start + items_per_page).min(self.mods.len());
         &self.mods[start..end]
     }
-
 }
 
 impl eframe::App for GooseModManager {
@@ -91,7 +90,8 @@ impl eframe::App for GooseModManager {
             })
             .show(ui, |ui| {
                 if self.needs_initial_focus {
-                    ui.ctx().memory_mut(|mem| mem.request_focus(egui::Id::new("tab_browse")));
+                    ui.ctx()
+                        .memory_mut(|mem| mem.request_focus(egui::Id::new("tab_browse")));
                     self.needs_initial_focus = false;
                 }
 
@@ -102,23 +102,28 @@ impl eframe::App for GooseModManager {
                         || i.key_pressed(egui::Key::ArrowLeft)
                         || i.key_pressed(egui::Key::ArrowRight)
                 });
-                
+
                 if arrow_pressed && ui.ctx().memory(|mem| mem.focused().is_none()) {
-                    ui.ctx().memory_mut(|mem| mem.request_focus(egui::Id::new("tab_browse")));
+                    ui.ctx()
+                        .memory_mut(|mem| mem.request_focus(egui::Id::new("tab_browse")));
                 }
 
                 // ── KEYBOARD / GAMEPAD ARROW NAVIGATION ───────────────────────────
                 if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowUp)) {
-                    ui.ctx().memory_mut(|mem| mem.move_focus(egui::FocusDirection::Up));
+                    ui.ctx()
+                        .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Up));
                 }
                 if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowDown)) {
-                    ui.ctx().memory_mut(|mem| mem.move_focus(egui::FocusDirection::Down));
+                    ui.ctx()
+                        .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Down));
                 }
                 if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowLeft)) {
-                    ui.ctx().memory_mut(|mem| mem.move_focus(egui::FocusDirection::Left));
+                    ui.ctx()
+                        .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Left));
                 }
                 if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowRight)) {
-                    ui.ctx().memory_mut(|mem| mem.move_focus(egui::FocusDirection::Right));
+                    ui.ctx()
+                        .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Right));
                 }
                 ui.spacing_mut().item_spacing = Vec2::new(10.0, 10.0);
 
@@ -140,8 +145,21 @@ impl eframe::App for GooseModManager {
 
                 ui.add_space(4.0);
 
-                // ── GRID ─────────────────────────────────────────────
-                ui::grid::render_grid(self, ui);
+                // ── GRID OR EMPTY STATE ─────────────────────────────────────────────
+                if self.sort_by == SortOption::Vehicle {
+                    ui::grid::render_grid(self, ui);
+                } else {
+                    ui.centered_and_justified(|ui| {
+                        ui.label(
+                            egui::RichText::new("Oops.. we ain't ready yet")
+                                .font(egui::FontId::new(
+                                    36.0,
+                                    egui::FontFamily::Name("Poppins".into()),
+                                ))
+                                .color(TEXT_WHITE),
+                        );
+                    });
+                }
             });
     }
 }

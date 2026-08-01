@@ -193,14 +193,18 @@ fn render_sort_controls(app: &mut GooseModManager, ui: &mut egui::Ui, top_right:
                         (Color32::TRANSPARENT, TEXT_WHITE)
                     };
 
+                    // TWEAK THIS: Increase to make hover background smaller, decrease to make it larger!
+                    let shrink_amount = 6.0;
+                    let visual_rect = item_rect.shrink(shrink_amount);
+
                     if bg != Color32::TRANSPARENT {
-                        area_painter.rect_filled(item_rect, CornerRadius::same(8), bg);
+                        area_painter.rect_filled(visual_rect, CornerRadius::same(6), bg);
                     }
 
                     if has_focus {
                         area_painter.rect_stroke(
-                            item_rect.expand(2.0),
-                            CornerRadius::same(8 + 2),
+                            visual_rect.expand(2.0),
+                            CornerRadius::same(6 + 2),
                             Stroke::new(2.0, FOCUS_COLOR),
                             StrokeKind::Outside,
                         );
