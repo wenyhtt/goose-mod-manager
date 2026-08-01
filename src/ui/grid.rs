@@ -116,12 +116,17 @@ fn paint_card(
     let info_padding = 12.0;
 
     // Mod name
-    painter.text(
+    let name_rect = Rect::from_min_size(
         Pos2::new(rect.left() + info_padding, info_top + 10.0),
-        egui::Align2::LEFT_TOP,
-        &mod_entry.name,
-        poppins_sm(),
-        TEXT_WHITE,
+        Vec2::new(rect.width() - info_padding * 2.0, 20.0),
+    );
+    ui.put(
+        name_rect,
+        egui::Label::new(
+            egui::RichText::new(&mod_entry.name)
+                .font(poppins_sm())
+                .color(TEXT_WHITE)
+        ).truncate()
     );
 
     // Bottom row

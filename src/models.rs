@@ -18,20 +18,20 @@ impl ModEntry {
 #[derive(Clone, Copy, PartialEq)]
 pub enum SortOption {
     Vehicle,
-    Name,
-    Size,
+    Visual,
+    Player,
 }
 
 impl SortOption {
     pub fn label(&self) -> &str {
         match self {
             SortOption::Vehicle => "VEHICLE",
-            SortOption::Name => "NAME",
-            SortOption::Size => "SIZE",
+            SortOption::Visual => "VISUAL",
+            SortOption::Player => "PLAYER",
         }
     }
     pub fn all() -> &'static [SortOption] {
-        &[SortOption::Vehicle, SortOption::Name, SortOption::Size]
+        &[SortOption::Vehicle, SortOption::Visual, SortOption::Player]
     }
 }
 

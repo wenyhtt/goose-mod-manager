@@ -2,7 +2,7 @@ use crate::app::GooseModManager;
 use crate::icons::paint_dropdown_arrow;
 use crate::models::{IconKind, SortOption, Tab};
 use crate::theme::{
-    CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS, TEXT_WHITE, poppins,
+    BG_DARK, CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS, TEXT_WHITE, poppins,
     poppins_sm,
 };
 use crate::ui::widgets::{icon_button, pill_button};
@@ -184,17 +184,19 @@ fn render_sort_controls(app: &mut GooseModManager, ui: &mut egui::Ui, top_right:
                 );
 
                 for (item_rect, hovered, clicked, has_focus, option) in local_states {
-                    if hovered {
+                    let (bg, text_color) = if option == app.sort_by {
+                        (TEXT_WHITE, BG_DARK)
+                    } else if hovered {
                         any_item_hovered = true;
-                        area_painter.rect_filled(item_rect, CornerRadius::same(8), CARD_BG_HOVER);
+                        (CARD_BG_HOVER, TEXT_WHITE)
+                    } else {
+                        (Color32::TRANSPARENT, TEXT_WHITE)
+                    };
+
+                    if bg != Color32::TRANSPARENT {
+                        area_painter.rect_filled(item_rect, CornerRadius::same(8), bg);
                     }
-                    if option == app.sort_by {
-                        area_painter.rect_filled(
-                            item_rect,
-                            CornerRadius::same(8),
-                            Color32::from_rgba_premultiplied(255, 255, 255, 15),
-                        );
-                    }
+
                     if has_focus {
                         area_painter.rect_stroke(
                             item_rect.expand(2.0),
@@ -208,7 +210,7 @@ fn render_sort_controls(app: &mut GooseModManager, ui: &mut egui::Ui, top_right:
                         egui::Align2::LEFT_CENTER,
                         option.label(),
                         poppins_sm(),
-                        TEXT_WHITE,
+                        text_color,
                     );
                     if clicked {
                         clicked_option = Some(option);
