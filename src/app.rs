@@ -12,6 +12,7 @@ pub struct GooseModManager {
     pub cols: usize,
     pub rows: usize,
     pub needs_initial_focus: bool,
+    pub gilrs: gilrs::Gilrs,
 }
 
 impl Default for GooseModManager {
@@ -52,6 +53,7 @@ impl Default for GooseModManager {
             cols: 4,
             rows: 2,
             needs_initial_focus: true,
+            gilrs: gilrs::Gilrs::new().unwrap(),
         }
     }
 }
@@ -73,6 +75,79 @@ impl GooseModManager {
 impl eframe::App for GooseModManager {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         let ctx = ui.ctx().clone();
+        
+        // ── GAMEPAD INPUT HANDLING ─────────────────────────────────────────
+        while let Some(gilrs::Event { event, .. }) = self.gilrs.next_event() {
+            match event {
+                gilrs::EventType::ButtonPressed(gilrs::Button::DPadUp, _) => {
+                    if ctx.memory(|mem| mem.focused().is_none()) {
+                        self.needs_initial_focus = true;
+                    } else {
+                        ctx.memory_mut(|mem| mem.move_focus(egui::FocusDirection::Up));
+                    }
+                }
+                gilrs::EventType::ButtonPressed(gilrs::Button::DPadDown, _) => {
+                    if ctx.memory(|mem| mem.focused().is_none()) {
+                        self.needs_initial_focus = true;
+                    } else {
+                        ctx.memory_mut(|mem| mem.move_focus(egui::FocusDirection::Down));
+                    }
+                }
+                gilrs::EventType::ButtonPressed(gilrs::Button::DPadLeft, _) => {
+                    if ctx.memory(|mem| mem.focused().is_none()) {
+                        self.needs_initial_focus = true;
+                    } else {
+                        ctx.memory_mut(|mem| mem.move_focus(egui::FocusDirection::Left));
+                    }
+                }
+                gilrs::EventType::ButtonPressed(gilrs::Button::DPadRight, _) => {
+                    if ctx.memory(|mem| mem.focused().is_none()) {
+                        self.needs_initial_focus = true;
+                    } else {
+                        ctx.memory_mut(|mem| mem.move_focus(egui::FocusDirection::Right));
+                    }
+                }
+                gilrs::EventType::ButtonPressed(gilrs::Button::South, _) => {
+                    ctx.input_mut(|i| i.events.push(egui::Event::Key {
+                        key: egui::Key::Enter,
+                        physical_key: None,
+                        pressed: true,
+                        repeat: false,
+                        modifiers: egui::Modifiers::NONE,
+                    }));
+                }
+                gilrs::EventType::ButtonReleased(gilrs::Button::South, _) => {
+                    ctx.input_mut(|i| i.events.push(egui::Event::Key {
+                        key: egui::Key::Enter,
+                        physical_key: None,
+                        pressed: false,
+                        repeat: false,
+                        modifiers: egui::Modifiers::NONE,
+                    }));
+                }
+                gilrs::EventType::ButtonPressed(gilrs::Button::East, _) => {
+                    ctx.input_mut(|i| i.events.push(egui::Event::Key {
+                        key: egui::Key::Escape,
+                        physical_key: None,
+                        pressed: true,
+                        repeat: false,
+                        modifiers: egui::Modifiers::NONE,
+                    }));
+                }
+                gilrs::EventType::ButtonReleased(gilrs::Button::East, _) => {
+                    ctx.input_mut(|i| i.events.push(egui::Event::Key {
+                        key: egui::Key::Escape,
+                        physical_key: None,
+                        pressed: false,
+                        repeat: false,
+                        modifiers: egui::Modifiers::NONE,
+                    }));
+                }
+                _ => {}
+            }
+        }
+        
+        ctx.request_repaint(); // Keep polling inputs
 
         // Apply dark style
         ctx.all_styles_mut(|style| {
@@ -89,41 +164,37 @@ impl eframe::App for GooseModManager {
                 ..Default::default()
             })
             .show(ui, |ui| {
-                if self.needs_initial_focus {
-                    ui.ctx()
-                        .memory_mut(|mem| mem.request_focus(egui::Id::new("tab_browse")));
-                    self.needs_initial_focus = false;
-                }
-
-                // If an arrow key is pressed but absolutely nothing is focused, grab focus to start.
+                // Initial focus is now handled directly inside top_bar.rs where the widget is rendered
                 let arrow_pressed = ui.input(|i| {
                     i.key_pressed(egui::Key::ArrowUp)
                         || i.key_pressed(egui::Key::ArrowDown)
                         || i.key_pressed(egui::Key::ArrowLeft)
                         || i.key_pressed(egui::Key::ArrowRight)
                 });
-
                 if arrow_pressed && ui.ctx().memory(|mem| mem.focused().is_none()) {
-                    ui.ctx()
-                        .memory_mut(|mem| mem.request_focus(egui::Id::new("tab_browse")));
+                    self.needs_initial_focus = true;
                 }
 
                 // ── KEYBOARD / GAMEPAD ARROW NAVIGATION ───────────────────────────
                 if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowUp)) {
-                    ui.ctx()
-                        .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Up));
+                    if ui.ctx().memory(|mem| mem.focused().is_some()) {
+                        ui.ctx().memory_mut(|mem| mem.move_focus(egui::FocusDirection::Up));
+                    }
                 }
                 if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowDown)) {
-                    ui.ctx()
-                        .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Down));
+                    if ui.ctx().memory(|mem| mem.focused().is_some()) {
+                        ui.ctx().memory_mut(|mem| mem.move_focus(egui::FocusDirection::Down));
+                    }
                 }
                 if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowLeft)) {
-                    ui.ctx()
-                        .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Left));
+                    if ui.ctx().memory(|mem| mem.focused().is_some()) {
+                        ui.ctx().memory_mut(|mem| mem.move_focus(egui::FocusDirection::Left));
+                    }
                 }
                 if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowRight)) {
-                    ui.ctx()
-                        .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Right));
+                    if ui.ctx().memory(|mem| mem.focused().is_some()) {
+                        ui.ctx().memory_mut(|mem| mem.move_focus(egui::FocusDirection::Right));
+                    }
                 }
                 ui.spacing_mut().item_spacing = Vec2::new(10.0, 10.0);
 

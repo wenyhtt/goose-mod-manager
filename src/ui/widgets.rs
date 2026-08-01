@@ -3,7 +3,7 @@ use crate::theme::{CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_BTN_SIZE, ICON_COLO
 use crate::models::IconKind;
 use crate::icons::{paint_left_arrow, paint_right_arrow};
 
-pub fn pill_button(ui: &mut egui::Ui, id_source: &str, text: &str, active: bool) -> bool {
+pub fn pill_button(ui: &mut egui::Ui, id_source: &str, text: &str, active: bool) -> egui::Response {
     let desired = Vec2::new(PILL_WIDTH, PILL_HEIGHT);
     let (rect, _resp) = ui.allocate_exact_size(desired, egui::Sense::hover());
     let response = ui.interact(rect, ui.id().with(id_source), egui::Sense::click());
@@ -39,10 +39,10 @@ pub fn pill_button(ui: &mut egui::Ui, id_source: &str, text: &str, active: bool)
         );
     }
 
-    response.clicked()
+    response
 }
 
-pub fn icon_button(ui: &mut egui::Ui, kind: IconKind) -> bool {
+pub fn icon_button(ui: &mut egui::Ui, kind: IconKind) -> egui::Response {
     let desired = Vec2::new(ICON_BTN_SIZE, ICON_BTN_SIZE);
     let (rect, response) = ui.allocate_exact_size(desired, egui::Sense::click());
 
@@ -74,5 +74,5 @@ pub fn icon_button(ui: &mut egui::Ui, kind: IconKind) -> bool {
         );
     }
 
-    response.clicked()
+    response
 }

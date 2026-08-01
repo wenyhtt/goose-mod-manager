@@ -32,12 +32,19 @@ pub fn render_top_bar(app: &mut GooseModManager, ui: &mut egui::Ui) {
                         let tabs_resp = ui
                             .horizontal(|ui| {
                                 ui.spacing_mut().item_spacing.x = 10.0;
-                                if pill_button(
+                                let browse_resp = pill_button(
                                     ui,
                                     "tab_browse",
                                     "BROWSE",
                                     app.active_tab == Tab::Browse,
-                                ) {
+                                );
+                                
+                                if app.needs_initial_focus {
+                                    browse_resp.request_focus();
+                                    app.needs_initial_focus = false;
+                                }
+
+                                if browse_resp.clicked() {
                                     app.active_tab = Tab::Browse;
                                     app.current_page = 0;
                                 }
@@ -46,7 +53,7 @@ pub fn render_top_bar(app: &mut GooseModManager, ui: &mut egui::Ui) {
                                     "tab_installed",
                                     "INSTALLED",
                                     app.active_tab == Tab::Installed,
-                                ) {
+                                ).clicked() {
                                     app.active_tab = Tab::Installed;
                                     app.current_page = 0;
                                 }
@@ -58,10 +65,10 @@ pub fn render_top_bar(app: &mut GooseModManager, ui: &mut egui::Ui) {
                         let arrows_resp = ui
                             .horizontal(|ui| {
                                 ui.spacing_mut().item_spacing.x = 10.0;
-                                if icon_button(ui, IconKind::LeftArrow) && app.current_page > 0 {
+                                if icon_button(ui, IconKind::LeftArrow).clicked() && app.current_page > 0 {
                                     app.current_page -= 1;
                                 }
-                                if icon_button(ui, IconKind::RightArrow)
+                                if icon_button(ui, IconKind::RightArrow).clicked()
                                     && app.current_page < app.total_pages().saturating_sub(1)
                                 {
                                     app.current_page += 1;
