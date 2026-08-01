@@ -1,0 +1,59 @@
+use eframe::egui::{self, CornerRadius, Vec2};
+use crate::theme::{CARD_BG, CARD_BG_HOVER, ICON_BTN_SIZE, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS, PILL_WIDTH, TAB_ACTIVE, TAB_INACTIVE, TEXT_WHITE, poppins};
+use crate::models::IconKind;
+use crate::icons::{paint_left_arrow, paint_right_arrow};
+
+pub fn pill_button(ui: &mut egui::Ui, text: &str, active: bool) -> bool {
+    let desired = Vec2::new(PILL_WIDTH, PILL_HEIGHT);
+    let (rect, response) = ui.allocate_exact_size(desired, egui::Sense::click());
+
+    let bg = if active {
+        TAB_ACTIVE
+    } else if response.hovered() {
+        CARD_BG_HOVER
+    } else {
+        TAB_INACTIVE
+    };
+
+    let painter = ui.painter();
+    painter.rect_filled(rect, CornerRadius::same(PILL_RADIUS), bg);
+    painter.text(
+        rect.center(),
+        egui::Align2::CENTER_CENTER,
+        text,
+        poppins(),
+        TEXT_WHITE,
+    );
+
+    if response.hovered() {
+        ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
+    }
+
+    response.clicked()
+}
+
+pub fn icon_button(ui: &mut egui::Ui, kind: IconKind) -> bool {
+    let desired = Vec2::new(ICON_BTN_SIZE, ICON_BTN_SIZE);
+    let (rect, response) = ui.allocate_exact_size(desired, egui::Sense::click());
+
+    let bg = if response.hovered() {
+        CARD_BG_HOVER
+    } else {
+        CARD_BG
+    };
+
+    let painter = ui.painter();
+    painter.rect_filled(rect, CornerRadius::same(30), bg);
+
+    let center = rect.center();
+    match kind {
+        IconKind::LeftArrow => paint_left_arrow(painter, center, 20.0, ICON_COLOR),
+        IconKind::RightArrow => paint_right_arrow(painter, center, 20.0, ICON_COLOR),
+    }
+
+    if response.hovered() {
+        ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
+    }
+
+    response.clicked()
+}
