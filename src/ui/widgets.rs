@@ -1,11 +1,12 @@
-use eframe::egui::{self, CornerRadius, Vec2};
-use crate::theme::{CARD_BG, CARD_BG_HOVER, ICON_BTN_SIZE, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS, PILL_WIDTH, TAB_ACTIVE, TAB_INACTIVE, TEXT_WHITE, poppins};
+use eframe::egui::{self, CornerRadius, Stroke, StrokeKind, Vec2};
+use crate::theme::{CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_BTN_SIZE, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS, PILL_WIDTH, TAB_ACTIVE, TAB_INACTIVE, TEXT_WHITE, poppins};
 use crate::models::IconKind;
 use crate::icons::{paint_left_arrow, paint_right_arrow};
 
-pub fn pill_button(ui: &mut egui::Ui, text: &str, active: bool) -> bool {
+pub fn pill_button(ui: &mut egui::Ui, id_source: &str, text: &str, active: bool) -> bool {
     let desired = Vec2::new(PILL_WIDTH, PILL_HEIGHT);
-    let (rect, response) = ui.allocate_exact_size(desired, egui::Sense::click());
+    let (rect, _resp) = ui.allocate_exact_size(desired, egui::Sense::hover());
+    let response = ui.interact(rect, ui.id().with(id_source), egui::Sense::click());
 
     let bg = if active {
         TAB_ACTIVE
@@ -27,6 +28,15 @@ pub fn pill_button(ui: &mut egui::Ui, text: &str, active: bool) -> bool {
 
     if response.hovered() {
         ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
+    }
+
+    if response.has_focus() {
+        painter.rect_stroke(
+            rect.expand(4.0),
+            CornerRadius::same(PILL_RADIUS + 4),
+            Stroke::new(2.0, FOCUS_COLOR),
+            StrokeKind::Outside,
+        );
     }
 
     response.clicked()
@@ -53,6 +63,15 @@ pub fn icon_button(ui: &mut egui::Ui, kind: IconKind) -> bool {
 
     if response.hovered() {
         ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
+    }
+
+    if response.has_focus() {
+        painter.rect_stroke(
+            rect.expand(4.0),
+            CornerRadius::same(30 + 4),
+            Stroke::new(2.0, FOCUS_COLOR),
+            StrokeKind::Outside,
+        );
     }
 
     response.clicked()

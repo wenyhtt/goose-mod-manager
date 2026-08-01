@@ -1470,7 +1470,6 @@ dependencies = [
  "eframe",
  "egui_extras",
  "env_logger",
- "image",
 ]
 
 [[package]]

@@ -1,7 +1,7 @@
-use eframe::egui::{self, Color32, CornerRadius, Pos2, Rect, Vec2};
+use eframe::egui::{self, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Vec2};
 use crate::app::GooseModManager;
 use crate::models::ModEntry;
-use crate::theme::{CARD_BG, CARD_BG_HOVER, CARD_RADIUS, GRID_COLS, GRID_ROWS, ICON_COLOR, TEXT_WHITE, poppins_sm};
+use crate::theme::{CARD_BG, CARD_BG_HOVER, CARD_RADIUS, FOCUS_COLOR, ICON_COLOR, TEXT_WHITE, poppins_sm};
 use crate::icons::paint_download_icon;
 
 pub fn render_grid(app: &GooseModManager, ui: &mut egui::Ui) {
@@ -11,15 +11,15 @@ pub fn render_grid(app: &GooseModManager, ui: &mut egui::Ui) {
     let padding = 10.0;
     let total_w = available.x - padding * 2.0;
     let total_h = available.y - padding * 2.0;
-    let card_w = (total_w - (GRID_COLS as f32 - 1.0) * gap) / GRID_COLS as f32;
-    let card_h = (total_h - (GRID_ROWS as f32 - 1.0) * gap) / GRID_ROWS as f32;
+    let card_w = (total_w - (app.cols as f32 - 1.0) * gap) / app.cols as f32;
+    let card_h = (total_h - (app.rows as f32 - 1.0) * gap) / app.rows as f32;
     let origin = ui.cursor().min + Vec2::new(padding, padding);
 
-    // Collect interaction data first (mutable borrows)
-    let mut card_data: Vec<(Rect, bool, &ModEntry)> = Vec::new();
-    for row in 0..GRID_ROWS {
-        for col in 0..GRID_COLS {
-            let idx = row * GRID_COLS + col;
+    // Collect interaction data first (mutable borrows for allocate_rect)
+    let mut card_data: Vec<(Rect, bool, bool, ModEntry)> = Vec::new();
+    for row in 0..app.rows {
+        for col in 0..app.cols {
+            let idx = row * app.cols + col;
             if idx >= page_mods.len() {
                 continue;
             }
@@ -28,17 +28,18 @@ pub fn render_grid(app: &GooseModManager, ui: &mut egui::Ui) {
             let card_rect = Rect::from_min_size(Pos2::new(x, y), Vec2::new(card_w, card_h));
             let card_resp = ui.allocate_rect(card_rect, egui::Sense::click());
             let is_hovered = card_resp.hovered();
+            let has_focus = card_resp.has_focus();
             if is_hovered {
                 ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
             }
-            card_data.push((card_rect, is_hovered, &page_mods[idx]));
+            card_data.push((card_rect, is_hovered, has_focus, page_mods[idx].clone()));
         }
     }
 
-    // Now paint all cards (immutable painter borrow)
-    let painter = ui.painter();
-    for (rect, is_hovered, mod_entry) in &card_data {
-        paint_card(app, painter, *rect, *is_hovered, mod_entry);
+    // Paint all cards (needs both painter and ui for image rendering)
+    for (rect, is_hovered, has_focus, mod_entry) in &card_data {
+        let painter = ui.painter().clone();
+        paint_card(app, &painter, ui, *rect, *is_hovered, *has_focus, mod_entry);
     }
 
     // Reserve the space
@@ -46,94 +47,69 @@ pub fn render_grid(app: &GooseModManager, ui: &mut egui::Ui) {
 }
 
 fn paint_card(
-    app: &GooseModManager,
+    _app: &GooseModManager,
     painter: &egui::Painter,
+    ui: &mut egui::Ui,
     rect: Rect,
     is_hovered: bool,
+    has_focus: bool,
     mod_entry: &ModEntry,
 ) {
     // Card background
     let bg = if is_hovered { CARD_BG_HOVER } else { CARD_BG };
     painter.rect_filled(rect, CornerRadius::same(CARD_RADIUS), bg);
 
+    if has_focus {
+        painter.rect_stroke(
+            rect.expand(4.0),
+            CornerRadius::same(CARD_RADIUS + 4),
+            Stroke::new(2.0, FOCUS_COLOR),
+            StrokeKind::Outside,
+        );
+    }
+
     // Image area (top ~58%)
     let image_height = rect.height() * 0.58;
     let image_rect = Rect::from_min_size(rect.min, Vec2::new(rect.width(), image_height));
 
-    if let Some(tex) = &app.card_texture {
-        let top_rounding = CornerRadius {
-            nw: CARD_RADIUS,
-            ne: CARD_RADIUS,
-            sw: 0,
-            se: 0,
+    let top_rounding = CornerRadius {
+        nw: CARD_RADIUS,
+        ne: CARD_RADIUS,
+        sw: 0,
+        se: 0,
+    };
+
+    // Use egui::Image with include_bytes via ImageSource::Bytes
+    let image = egui::Image::new(egui::ImageSource::Bytes {
+        uri: "bytes://card_image.png".into(),
+        bytes: egui::load::Bytes::Static(include_bytes!("../../assets/card_image.png")),
+    });
+
+    // Cover crop: calculate UV to fill the rect without stretching,
+    // cropping excess from the center (like CSS object-fit: cover)
+    let rect_aspect = image_rect.width() / image_rect.height();
+    let cropped_image = if let Some(natural_size) = image.load_and_calc_size(ui, Vec2::splat(f32::INFINITY)) {
+        let img_aspect = natural_size.x / natural_size.y;
+        let uv = if img_aspect > rect_aspect {
+            // Image is wider — crop sides
+            let visible = rect_aspect / img_aspect;
+            let off = (1.0 - visible) / 2.0;
+            Rect::from_min_max(Pos2::new(off, 0.0), Pos2::new(1.0 - off, 1.0))
+        } else {
+            // Image is taller — crop top/bottom
+            let visible = img_aspect / rect_aspect;
+            let off = (1.0 - visible) / 2.0;
+            Rect::from_min_max(Pos2::new(0.0, off), Pos2::new(1.0, 1.0 - off))
         };
-        painter.rect_filled(image_rect, top_rounding, Color32::BLACK);
+        image.uv(uv)
+    } else {
+        image // fallback while loading
+    };
 
-        let uv = Rect::from_min_max(Pos2::new(0.0, 0.0), Pos2::new(1.0, 1.0));
-        let mut mesh = egui::Mesh::with_texture(tex.id());
-
-        let r = CARD_RADIUS as f32;
-        let segments = 8;
-
-        let tl_center = Pos2::new(image_rect.left() + r, image_rect.top() + r);
-        let tr_center = Pos2::new(image_rect.right() - r, image_rect.top() + r);
-
-        let mut positions: Vec<Pos2> = Vec::new();
-
-        // Top-left arc
-        for i in 0..=segments {
-            let angle = std::f32::consts::PI
-                + (std::f32::consts::PI / 2.0) * (i as f32 / segments as f32);
-            positions.push(Pos2::new(
-                tl_center.x + r * angle.cos(),
-                tl_center.y + r * angle.sin(),
-            ));
-        }
-
-        // Top-right arc
-        for i in 0..=segments {
-            let angle = 3.0 * std::f32::consts::PI / 2.0
-                + (std::f32::consts::PI / 2.0) * (i as f32 / segments as f32);
-            positions.push(Pos2::new(
-                tr_center.x + r * angle.cos(),
-                tr_center.y + r * angle.sin(),
-            ));
-        }
-
-        // Bottom corners (no rounding)
-        positions.push(Pos2::new(image_rect.right(), image_rect.bottom()));
-        positions.push(Pos2::new(image_rect.left(), image_rect.bottom()));
-
-        for pos in &positions {
-            let u = (pos.x - image_rect.left()) / image_rect.width();
-            let v = (pos.y - image_rect.top()) / image_rect.height();
-            mesh.vertices.push(egui::epaint::Vertex {
-                pos: *pos,
-                uv: Pos2::new(
-                    uv.min.x + u * (uv.max.x - uv.min.x),
-                    uv.min.y + v * (uv.max.y - uv.min.y),
-                ),
-                color: Color32::WHITE,
-            });
-        }
-
-        let center = image_rect.center();
-        let center_idx = mesh.vertices.len() as u32;
-        mesh.vertices.push(egui::epaint::Vertex {
-            pos: center,
-            uv: Pos2::new(0.5, 0.5),
-            color: Color32::WHITE,
-        });
-
-        let n = positions.len() as u32;
-        for i in 0..n {
-            mesh.indices.push(center_idx);
-            mesh.indices.push(i);
-            mesh.indices.push((i + 1) % n);
-        }
-
-        painter.add(egui::Shape::mesh(mesh));
-    }
+    cropped_image
+        .corner_radius(top_rounding)
+        .fit_to_exact_size(image_rect.size())
+        .paint_at(ui, image_rect);
 
     // Info area
     let info_top = image_rect.bottom() + 2.0;

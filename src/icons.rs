@@ -2,28 +2,24 @@ use eframe::egui::{self, Color32, Pos2, Stroke};
 
 pub fn paint_left_arrow(painter: &egui::Painter, center: Pos2, size: f32, color: Color32) {
     let s = size / 2.0;
+    let stroke = Stroke::new(3.0, color);
     let points = vec![
-        Pos2::new(center.x + s * 0.24, center.y - s),
-        Pos2::new(center.x - s * 0.5, center.y),
-        Pos2::new(center.x + s * 0.24, center.y + s),
-        Pos2::new(center.x + s * 0.4, center.y + s * 0.82),
-        Pos2::new(center.x - s * 0.2, center.y),
-        Pos2::new(center.x + s * 0.4, center.y - s * 0.82),
+        Pos2::new(center.x + s * 0.3, center.y - s * 0.5),
+        Pos2::new(center.x - s * 0.3, center.y),
+        Pos2::new(center.x + s * 0.3, center.y + s * 0.5),
     ];
-    painter.add(egui::Shape::convex_polygon(points, color, Stroke::NONE));
+    painter.add(egui::Shape::line(points, stroke));
 }
 
 pub fn paint_right_arrow(painter: &egui::Painter, center: Pos2, size: f32, color: Color32) {
     let s = size / 2.0;
+    let stroke = Stroke::new(3.0, color);
     let points = vec![
-        Pos2::new(center.x - s * 0.24, center.y - s),
-        Pos2::new(center.x + s * 0.5, center.y),
-        Pos2::new(center.x - s * 0.24, center.y + s),
-        Pos2::new(center.x - s * 0.4, center.y + s * 0.82),
-        Pos2::new(center.x + s * 0.2, center.y),
-        Pos2::new(center.x - s * 0.4, center.y - s * 0.82),
+        Pos2::new(center.x - s * 0.3, center.y - s * 0.5),
+        Pos2::new(center.x + s * 0.3, center.y),
+        Pos2::new(center.x - s * 0.3, center.y + s * 0.5),
     ];
-    painter.add(egui::Shape::convex_polygon(points, color, Stroke::NONE));
+    painter.add(egui::Shape::line(points, stroke));
 }
 
 pub fn paint_dropdown_arrow(painter: &egui::Painter, center: Pos2, size: f32, color: Color32) {
