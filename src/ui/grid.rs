@@ -17,6 +17,50 @@ pub fn render_grid(app: &GooseModManager, ui: &mut egui::Ui) {
     let card_h = (total_h - (app.rows as f32 - 1.0) * gap) / app.rows as f32;
     let origin = ui.cursor().min + Vec2::new(padding, padding);
 
+    if page_mods.is_empty() && app.is_loading() {
+        for row in 0..app.rows {
+            for col in 0..app.cols {
+                let x = origin.x + col as f32 * (card_w + gap);
+                let y = origin.y + row as f32 * (card_h + gap);
+                let rect = Rect::from_min_size(Pos2::new(x, y), Vec2::new(card_w, card_h));
+                let image_rect = Rect::from_min_size(
+                    rect.min,
+                    Vec2::new(rect.width(), rect.height() * 0.58),
+                );
+                ui.painter()
+                    .rect_filled(rect, CornerRadius::same(CARD_RADIUS), CARD_BG);
+                ui.painter().rect_filled(
+                    image_rect,
+                    CornerRadius {
+                        nw: CARD_RADIUS,
+                        ne: CARD_RADIUS,
+                        sw: 0,
+                        se: 0,
+                    },
+                    CARD_BG_HOVER,
+                );
+                ui.painter().rect_filled(
+                    Rect::from_min_size(
+                        Pos2::new(rect.left() + 12.0, image_rect.bottom() + 12.0),
+                        Vec2::new(rect.width() * 0.62, 14.0),
+                    ),
+                    7.0,
+                    CARD_BG_HOVER,
+                );
+                ui.painter().rect_filled(
+                    Rect::from_min_size(
+                        Pos2::new(rect.left() + 12.0, rect.bottom() - 28.0),
+                        Vec2::new(rect.width() * 0.32, 12.0),
+                    ),
+                    6.0,
+                    CARD_BG_HOVER,
+                );
+            }
+        }
+        ui.allocate_space(available);
+        return;
+    }
+
     // Collect interaction data first (mutable borrows for allocate_rect)
     let mut card_data: Vec<(Rect, bool, bool, usize)> = Vec::new();
     for row in 0..app.rows {

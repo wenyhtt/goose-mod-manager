@@ -122,13 +122,21 @@ impl GooseModManager {
 
     pub fn total_pages(&self) -> usize {
         let items_per_page = (self.cols * self.rows).max(1);
-        (self.mods.len() + items_per_page - 1) / items_per_page
+        let loaded_pages = (self.mods.len() + items_per_page - 1) / items_per_page;
+        loaded_pages + usize::from(self.scrape_task.is_some())
+    }
+
+    pub fn is_loading(&self) -> bool {
+        self.scrape_task.is_some()
     }
 
     pub fn page_mods(&self) -> &[ModEntry] {
         let items_per_page = (self.cols * self.rows).max(1);
-        let page = self.current_page.min(self.total_pages().saturating_sub(1));
-        let start = page * items_per_page;
+        let loaded_pages = (self.mods.len() + items_per_page - 1) / items_per_page;
+        if self.current_page >= loaded_pages {
+            return &[];
+        }
+        let start = self.current_page * items_per_page;
         let end = (start + items_per_page).min(self.mods.len());
         &self.mods[start..end]
     }

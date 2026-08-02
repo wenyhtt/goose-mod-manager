@@ -3,6 +3,7 @@ use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
 use std::time::Duration;
+use std::collections::HashMap;
 
 use crate::models::ModEntry;
 
@@ -10,6 +11,17 @@ fn project_root() -> PathBuf {
     let manifest = std::env::var("CARGO_MANIFEST_DIR")
         .unwrap_or_else(|_| env!("CARGO_MANIFEST_DIR").to_string());
     PathBuf::from(manifest)
+}
+
+fn load_cached_mods() -> HashMap<String, ModEntry> {
+    let path = project_root().join("mods.json");
+    fs::read_to_string(path)
+        .ok()
+        .and_then(|data| serde_json::from_str::<Vec<ModEntry>>(&data).ok())
+        .unwrap_or_default()
+        .into_iter()
+        .map(|mod_entry| (mod_entry.url.clone(), mod_entry))
+        .collect()
 }
 
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -38,6 +50,7 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
     let li_selector = Selector::parse("li").unwrap();
 
     let mut mods = Vec::new();
+    let cached_mods = load_cached_mods();
     let root = project_root();
     let thumb_dir = root.join("assets/thumbnails");
     fs::create_dir_all(&thumb_dir)?;
@@ -47,6 +60,18 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
             let href = a_elem.value().attr("href").unwrap_or("");
             let title = a_elem.value().attr("title").unwrap_or("");
             let full_url = format!("{}{}", base_url, href);
+
+            if let Some(cached) = cached_mods.get(&full_url) {
+                if cached
+                    .thumbnail_path
+                    .as_ref()
+                    .map(|path| fs::metadata(path).map(|m| m.len() > 0).unwrap_or(false))
+                    .unwrap_or(false)
+                {
+                    mods.push(cached.clone());
+                    continue;
+                }
+            }
 
             let img_src = element
                 .select(&img_selector)
@@ -70,7 +95,9 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
             };
 
             let thumbnail_path = if img_src.is_empty() {
-                None
+                cached_mods
+                    .get(&full_url)
+                    .and_then(|mod_entry| mod_entry.thumbnail_path.clone())
             } else {
                 let file_name = img_src.split('/').last().unwrap_or("thumb.jpg");
                 let abs_path = thumb_dir.join(file_name);
@@ -90,12 +117,12 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
                 Some(abs_path.to_string_lossy().to_string())
             };
 
-            mods.push(ModEntry::new(
-                title,
-                &category,
-                &full_url,
-                thumbnail_path.as_deref(),
-            ));
+            let mut mod_entry = cached_mods
+                .get(&full_url)
+                .cloned()
+                .unwrap_or_else(|| ModEntry::new(title, &category, &full_url, None));
+            mod_entry.thumbnail_path = thumbnail_path;
+            mods.push(mod_entry);
         }
     }
 

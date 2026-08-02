@@ -62,31 +62,18 @@ pub fn render_top_bar(app: &mut GooseModManager, ui: &mut egui::Ui) {
                         tabs_top_y = tabs_resp.rect.top();
 
                         // Arrow navigation
-                        let arrows_resp = ui
-                            .horizontal(|ui| {
-                                ui.spacing_mut().item_spacing.x = 10.0;
-                                if icon_button(ui, IconKind::LeftArrow).clicked() && app.current_page > 0 {
-                                    app.current_page -= 1;
-                                }
-                                if icon_button(ui, IconKind::RightArrow).clicked()
-                                    && app.current_page < app.total_pages().saturating_sub(1)
-                                {
-                                    app.current_page += 1;
-                                }
-                            })
-                            .response;
+                        ui.horizontal(|ui| {
+                            ui.spacing_mut().item_spacing.x = 10.0;
+                            if icon_button(ui, IconKind::LeftArrow).clicked() && app.current_page > 0 {
+                                app.current_page -= 1;
+                            }
+                            if icon_button(ui, IconKind::RightArrow).clicked()
+                                && app.current_page < app.total_pages().saturating_sub(1)
+                            {
+                                app.current_page += 1;
+                            }
+                        });
 
-                        // Page indicator (Centered perfectly on screen, vertically aligned with arrows)
-                        let page_text =
-                            format!("Page {} of {}", app.current_page + 1, app.total_pages());
-
-                        ui.painter().text(
-                            Pos2::new(ui.max_rect().center().x, arrows_resp.rect.center().y),
-                            egui::Align2::CENTER_CENTER,
-                            page_text,
-                            poppins(),
-                            TEXT_WHITE,
-                        );
                     });
                 });
             });
