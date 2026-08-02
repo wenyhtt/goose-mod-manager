@@ -40,8 +40,8 @@
     "semantic_hash": "ea0c834da84654657b1be5d4375a6870"
   },
   "src/ui/grid.rs": {
-    "mtime": 1785651161.7035003,
-    "ast_hash": "60aec9a75da10695b6ca0a3a1fecaafa",
+    "mtime": 1785664158.8882787,
+    "ast_hash": "504e7ca167a8061899b2d13321b1cb08",
     "semantic_hash": ""
   },
   "src/ui/mod.rs": {
@@ -114,11 +114,6 @@
     "ast_hash": "9ed82e483cf87bb68eec64509cfdcc5e",
     "semantic_hash": ""
   },
-  "assets/card_image.png": {
-    "mtime": 1785571154.1823103,
-    "ast_hash": "1607f2103dca21a265696d4c2aa7915d",
-    "semantic_hash": ""
-  },
   "assets/icon_download.svg": {
     "mtime": 1785574053.3436673,
     "ast_hash": "936159f86aa4dc4e7bae23cb87535231",
@@ -137,6 +132,11 @@
   "assets/icon_right_arrow.svg": {
     "mtime": 1785574165.0677462,
     "ast_hash": "4a4688d3e0ea619abfc1b28b92491087",
+    "semantic_hash": ""
+  },
+  "assets/card_image_fallback.png": {
+    "mtime": 1785664059.5685666,
+    "ast_hash": "c888f750735d6d144a2b1a1abc7f407a",
     "semantic_hash": ""
   }
 }

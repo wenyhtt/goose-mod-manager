@@ -540,24 +540,32 @@
       "_origin": "ast"
     },
     {
-      "id": "src_ui_grid_paint_card",
-      "label": "paint_card()",
+      "id": "src_ui_grid_paint_skeleton",
+      "label": "paint_skeleton()",
       "file_type": "code",
       "source_file": "src/ui/grid.rs",
-      "source_location": "L102",
+      "source_location": "L73",
       "_origin": "ast"
     },
     {
-      "id": "src_ui_grid_rs_painter",
-      "label": "Painter",
+      "id": "rect",
+      "label": "Rect",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
       "_origin": "ast"
     },
     {
-      "id": "rect",
-      "label": "Rect",
+      "id": "src_ui_grid_paint_card",
+      "label": "paint_card()",
+      "file_type": "code",
+      "source_file": "src/ui/grid.rs",
+      "source_location": "L105",
+      "_origin": "ast"
+    },
+    {
+      "id": "src_ui_grid_rs_painter",
+      "label": "Painter",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
@@ -2608,11 +2616,43 @@
     },
     {
       "source": "src_ui_grid",
+      "target": "src_ui_grid_paint_skeleton",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/grid.rs",
+      "source_location": "L73",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "src_ui_grid_paint_skeleton",
+      "target": "src_ui_grid_rs_ui",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/grid.rs",
+      "source_location": "L73",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast"
+    },
+    {
+      "source": "src_ui_grid_paint_skeleton",
+      "target": "rect",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/grid.rs",
+      "source_location": "L73",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast"
+    },
+    {
+      "source": "src_ui_grid",
       "target": "src_ui_grid_paint_card",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/grid.rs",
-      "source_location": "L102",
+      "source_location": "L105",
       "weight": 1.0,
       "_origin": "ast"
     },
@@ -2622,7 +2662,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/grid.rs",
-      "source_location": "L102",
+      "source_location": "L105",
       "weight": 1.0,
       "context": "parameter_type",
       "_origin": "ast"
@@ -2633,7 +2673,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/grid.rs",
-      "source_location": "L102",
+      "source_location": "L105",
       "weight": 1.0,
       "context": "parameter_type",
       "_origin": "ast"
@@ -2644,7 +2684,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/grid.rs",
-      "source_location": "L102",
+      "source_location": "L105",
       "weight": 1.0,
       "context": "parameter_type",
       "_origin": "ast"
@@ -2655,7 +2695,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/grid.rs",
-      "source_location": "L102",
+      "source_location": "L105",
       "weight": 1.0,
       "context": "parameter_type",
       "_origin": "ast"
@@ -2667,7 +2707,18 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/grid.rs",
-      "source_location": "L88",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "src_ui_grid_render_grid",
+      "target": "src_ui_grid_paint_skeleton",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/grid.rs",
+      "source_location": "L65",
       "weight": 1.0,
       "_origin": "ast"
     },
@@ -3590,7 +3641,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/ui/grid.rs",
-      "source_location": "L191",
+      "source_location": "L196",
       "weight": 1.0,
       "_origin": "ast"
     },
@@ -3602,7 +3653,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/ui/grid.rs",
-      "source_location": "L211",
+      "source_location": "L216",
       "weight": 1.0,
       "_origin": "ast"
     },
