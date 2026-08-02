@@ -25,3 +25,7 @@ pub fn poppins() -> FontId {
 pub fn poppins_sm() -> FontId {
     FontId::new(20.0, FontFamily::Name("Poppins".into()))
 }
+
+pub fn poppins_xs() -> FontId {
+    FontId::new(14.0, FontFamily::Name("Poppins".into()))
+}

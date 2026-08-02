@@ -1,4 +1,4 @@
-use scraper::{Html, Selector};
+use scraper::{ElementRef, Html, Selector};
 use std::collections::HashMap;
 use std::fs;
 use std::io::Write;
@@ -65,6 +65,9 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
     let a_selector = Selector::parse("a").unwrap();
     let img_selector = Selector::parse("img").unwrap();
     let li_selector = Selector::parse("li").unwrap();
+    let author_selector = Selector::parse("a[href*='/users/'], a[href*='/user/']").unwrap();
+    let version_selector = Selector::parse("[class*='version'], [class*='Version']").unwrap();
+    let downloads_selector = Selector::parse("[class*='download'], [class*='Download']").unwrap();
 
     let mut mods = Vec::new();
     let cached_mods = load_cached_mods();
@@ -83,6 +86,9 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
                     .as_ref()
                     .map(|path| fs::metadata(path).map(|m| m.len() > 0).unwrap_or(false))
                     .unwrap_or(false)
+                    && !cached.author.is_empty()
+                    && !cached.version.is_empty()
+                    && !cached.downloads.is_empty()
                 {
                     mods.push(cached.clone());
                     continue;
@@ -100,15 +106,29 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
                 .select(&li_selector)
                 .map(|li| li.text().collect::<String>().trim().to_string())
                 .filter(|s| !s.is_empty())
-                .take(2)
+                .take(3)
                 .collect();
-            let category = if categories.is_empty() {
+            let category = categories
+                .into_iter()
+                .filter(|category| category != "Add-On")
+                .collect::<Vec<_>>();
+            let category = if category.is_empty() {
                 "Script".to_string()
-            } else if categories[0] == "Add-On" {
-                categories.get(1).cloned().unwrap_or_else(|| categories[0].clone())
             } else {
-                categories[0].clone()
+                category.join(", ")
             };
+
+            let author = element
+                .select(&author_selector)
+                .map(element_text)
+                .find(|text| !text.is_empty())
+                .unwrap_or_default();
+            let version = element
+                .select(&version_selector)
+                .map(element_text)
+                .find(|text| !text.is_empty())
+                .unwrap_or_default();
+            let downloads = extract_downloads(element, title, &downloads_selector);
 
             let thumbnail_path = if img_src.is_empty() {
                 cached_mods
@@ -136,13 +156,63 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
             let mut mod_entry = cached_mods
                 .get(&full_url)
                 .cloned()
-                .unwrap_or_else(|| ModEntry::new(title, &category, &full_url, None));
+                .unwrap_or_else(|| ModEntry::new(title, &category, &full_url, "", "", "", None));
+            if !author.is_empty() {
+                mod_entry.author = author;
+            }
+            if !version.is_empty() {
+                mod_entry.version = version;
+            }
+            if !downloads.is_empty() {
+                mod_entry.downloads = downloads;
+            }
             mod_entry.thumbnail_path = thumbnail_path;
             mods.push(mod_entry);
         }
     }
 
     Ok(mods)
+}
+
+fn element_text(element: ElementRef<'_>) -> String {
+    element.text().collect::<String>().trim().to_string()
+}
+
+fn extract_downloads(
+    element: ElementRef<'_>,
+    title: &str,
+    selector: &Selector,
+) -> String {
+    if let Some(downloads) = element
+        .select(selector)
+        .map(element_text)
+        .find(|text| is_count(text))
+    {
+        return downloads;
+    }
+
+    let text = element
+        .text()
+        .map(str::trim)
+        .filter(|text| !text.is_empty())
+        .collect::<Vec<_>>()
+        .join(" ");
+    let before_title = text.split(title).next().unwrap_or(&text);
+
+    before_title
+        .split_whitespace()
+        .find(|token| is_count(token))
+        .unwrap_or_default()
+        .to_string()
+}
+
+fn is_count(value: &str) -> bool {
+    let value = value.trim_matches(|character: char| !character.is_ascii_digit() && character != ',');
+    !value.is_empty()
+        && value.chars().any(|character| character.is_ascii_digit())
+        && value
+            .chars()
+            .all(|character| character.is_ascii_digit() || character == ',')
 }
 
 pub fn save_mods(mods: &[ModEntry]) -> Result<(), Box<dyn std::error::Error>> {
@@ -154,4 +224,37 @@ pub fn save_mods(mods: &[ModEntry]) -> Result<(), Box<dyn std::error::Error>> {
     file.write_all(json_data.as_bytes())?;
     println!("Scraping complete. Saved {} mods to {}", mods.len(), json_path.display());
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn extracts_author_and_version_from_listing() {
+        let document = Html::parse_fragment(
+            r#"<div class="file-list-obj"><a href="/users/tester">Tester</a><span class="file-version">V2.1</span><span class="downloads">226</span></div>"#,
+        );
+        let item = document
+            .select(&Selector::parse(".file-list-obj").unwrap())
+            .next()
+            .unwrap();
+        let author_selector = Selector::parse("a[href*='/users/'], a[href*='/user/']").unwrap();
+        let version_selector = Selector::parse("[class*='version'], [class*='Version']").unwrap();
+
+        assert_eq!(
+            item.select(&author_selector).next().map(element_text),
+            Some("Tester".to_string())
+        );
+        assert_eq!(
+            item.select(&version_selector).next().map(element_text),
+            Some("V2.1".to_string())
+        );
+        let downloads_selector = Selector::parse("[class*='download'], [class*='Download']").unwrap();
+        assert_eq!(
+            item.select(&downloads_selector).next().map(element_text),
+            Some("226".to_string())
+        );
+        assert_eq!(extract_downloads(item, "Test Mod", &downloads_selector), "226");
+    }
 }

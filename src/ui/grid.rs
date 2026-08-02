@@ -2,7 +2,8 @@ use crate::app::GooseModManager;
 use crate::icons::paint_download_icon;
 use crate::models::ModEntry;
 use crate::theme::{
-    CARD_BG, CARD_BG_HOVER, CARD_RADIUS, FOCUS_COLOR, ICON_COLOR, TEXT_WHITE, poppins_sm,
+    BG_DARK, CARD_BG, CARD_BG_HOVER, CARD_RADIUS, FOCUS_COLOR, ICON_COLOR, TEXT_WHITE, poppins_sm,
+    poppins_xs,
 };
 use eframe::egui::{self, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Vec2};
 
@@ -183,13 +184,47 @@ fn paint_card(
         .fit_to_exact_size(image_rect.size())
         .paint_at(ui, image_rect);
 
+    if !mod_entry.version.is_empty() {
+        let version = if mod_entry.version.starts_with(['v', 'V']) {
+            mod_entry.version.clone()
+        } else {
+            format!("v{}", mod_entry.version)
+        };
+        let badge = Rect::from_min_size(
+            Pos2::new(image_rect.right() - 62.0, image_rect.bottom() - 32.0),
+            Vec2::new(58.0, 28.0),
+        );
+        painter.rect_filled(badge, CornerRadius::same(14), CARD_BG);
+        painter.text(
+            badge.center(),
+            egui::Align2::CENTER_CENTER,
+            version,
+            poppins_xs(),
+            TEXT_WHITE,
+        );
+    }
+
     // Info area
     let info_top = image_rect.bottom() + 2.0;
     let info_padding = 12.0;
 
     // Mod name
+    let category_rect = Rect::from_min_size(
+        Pos2::new(rect.left() + info_padding, info_top + 8.0),
+        Vec2::new(rect.width() - info_padding * 2.0, 18.0),
+    );
+    ui.put(
+        category_rect,
+        egui::Label::new(
+            egui::RichText::new(&mod_entry.category)
+                .font(poppins_xs())
+                .color(TEXT_WHITE.gamma_multiply(0.65)),
+        )
+        .truncate(),
+    );
+
     let name_rect = Rect::from_min_size(
-        Pos2::new(rect.left() + info_padding, info_top + 10.0),
+        Pos2::new(rect.left() + info_padding, info_top + 27.0),
         Vec2::new(rect.width() - info_padding * 2.0, 20.0),
     );
     ui.put(
@@ -205,16 +240,27 @@ fn paint_card(
     // Bottom row
     let bottom_y = rect.bottom() - info_padding - 8.0;
 
-    // Category
-    painter.text(
-        Pos2::new(rect.left() + info_padding, bottom_y),
-        egui::Align2::LEFT_CENTER,
-        &mod_entry.category,
-        poppins_sm(),
-        TEXT_WHITE,
-    );
+    if !mod_entry.author.is_empty() {
+        painter.text(
+            Pos2::new(rect.left() + info_padding, bottom_y),
+            egui::Align2::LEFT_CENTER,
+            format!("By {}", mod_entry.author),
+            poppins_xs(),
+            TEXT_WHITE.gamma_multiply(0.65),
+        );
+    }
+
+    if !mod_entry.downloads.is_empty() {
+        painter.text(
+            Pos2::new(rect.right() - info_padding - 22.0, bottom_y),
+            egui::Align2::RIGHT_CENTER,
+            &mod_entry.downloads,
+            poppins_xs(),
+            TEXT_WHITE,
+        );
+    }
 
     // Download icon
-    let icon_center = Pos2::new(rect.right() - info_padding - 12.0, bottom_y);
-    paint_download_icon(painter, icon_center, 20.0, ICON_COLOR);
+    let icon_center = Pos2::new(rect.right() - info_padding - 8.0, bottom_y - 3.0);
+    paint_download_icon(painter, icon_center, 16.0, ICON_COLOR);
 }
