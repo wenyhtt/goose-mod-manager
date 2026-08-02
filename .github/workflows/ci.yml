@@ -1,0 +1,25 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Test
+        run: cargo test --locked
+
+      - name: Build debug binary
+        run: cargo build --locked --bin goose-mod-manager
+
+      - name: Upload debug binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: goose-mod-manager-debug-linux
+          path: target/debug/goose-mod-manager

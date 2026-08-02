@@ -138,5 +138,10 @@
     "mtime": 1785664059.5685666,
     "ast_hash": "c888f750735d6d144a2b1a1abc7f407a",
     "semantic_hash": ""
+  },
+  ".github/workflows/ci.yml": {
+    "mtime": 1785667504.3867173,
+    "ast_hash": "95d961bd609c494018072f6c040ae3a1",
+    "semantic_hash": ""
   }
 }
