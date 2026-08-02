@@ -40,8 +40,8 @@
     "semantic_hash": "ea0c834da84654657b1be5d4375a6870"
   },
   "src/ui/grid.rs": {
-    "mtime": 1785664158.8882787,
-    "ast_hash": "504e7ca167a8061899b2d13321b1cb08",
+    "mtime": 1785664596.713346,
+    "ast_hash": "ceb8d080b2f934106371515cbccd19d0",
     "semantic_hash": ""
   },
   "src/ui/mod.rs": {

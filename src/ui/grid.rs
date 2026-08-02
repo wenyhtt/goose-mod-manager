@@ -137,6 +137,14 @@ fn paint_card(
     // Use egui::Image with include_bytes or dynamic bytes.
     // The bytes:// URI must include a file extension (.jpg, .png) so
     // egui_extras can pick the right decoder.
+    let fallback_image = || {
+        egui::Image::new(egui::ImageSource::Bytes {
+            uri: "bytes://card_image_fallback.png".into(),
+            bytes: egui::load::Bytes::Static(include_bytes!(
+                "../../assets/card_image_fallback.png"
+            )),
+        })
+    };
     let image =
         if let (Some(bytes), Some(thumb)) = (&mod_entry.image_bytes, &mod_entry.thumbnail_path) {
             let filename = thumb.rsplit('/').next().unwrap_or("thumb.jpg");
@@ -145,12 +153,7 @@ fn paint_card(
                 bytes: bytes.clone(),
             })
         } else {
-            egui::Image::new(egui::ImageSource::Bytes {
-                uri: "bytes://card_image_fallback.png".into(),
-                bytes: egui::load::Bytes::Static(include_bytes!(
-                    "../../assets/card_image_fallback.png"
-                )),
-            })
+            fallback_image()
         };
 
     // Cover crop: calculate UV to fill the rect without stretching,
@@ -172,7 +175,7 @@ fn paint_card(
             };
             image.uv(uv)
         } else {
-            image // fallback while loading
+            fallback_image()
         };
 
     cropped_image
