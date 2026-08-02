@@ -4,6 +4,7 @@ use eframe::egui::{FontData, FontDefinitions, FontFamily};
 mod app;
 mod icons;
 mod models;
+mod scraper;
 mod theme;
 mod ui;
 

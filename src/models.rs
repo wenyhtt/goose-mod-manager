@@ -1,11 +1,10 @@
-use serde::{Serialize, Deserialize};
 use eframe::egui;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct ModEntry {
     pub name: String,
     pub category: String,
-    pub size: String,
     pub url: String,
     pub thumbnail_path: Option<String>,
     #[serde(skip)]
@@ -13,11 +12,10 @@ pub struct ModEntry {
 }
 
 impl ModEntry {
-    pub fn new(name: &str, category: &str, size: &str, url: &str, thumbnail_path: Option<&str>) -> Self {
+    pub fn new(name: &str, category: &str, url: &str, thumbnail_path: Option<&str>) -> Self {
         Self {
             name: name.to_string(),
             category: category.to_string(),
-            size: size.to_string(),
             url: url.to_string(),
             thumbnail_path: thumbnail_path.map(|s| s.to_string()),
             image_bytes: None,

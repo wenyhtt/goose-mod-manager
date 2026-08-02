@@ -1,0 +1,246 @@
+{
+  "communities": {
+    "0": [
+      "app",
+      "default",
+      "frame",
+      "gilrs",
+      "joinhandle",
+      "src_app",
+      "src_app_goosemodmanager",
+      "src_app_goosemodmanager_default",
+      "src_app_goosemodmanager_load_mods",
+      "src_app_goosemodmanager_refresh_after_scrape",
+      "src_app_goosemodmanager_total_pages",
+      "src_app_goosemodmanager_ui",
+      "src_app_rs_option",
+      "src_app_rs_result",
+      "src_app_rs_self",
+      "src_app_rs_string",
+      "src_app_rs_ui",
+      "vec"
+    ],
+    "1": [
+      "fontid",
+      "response",
+      "src_models_iconkind",
+      "src_theme",
+      "src_theme_poppins",
+      "src_theme_poppins_sm",
+      "src_ui_top_bar",
+      "src_ui_top_bar_render_sort_controls",
+      "src_ui_top_bar_render_top_bar",
+      "src_ui_top_bar_rs_pos2",
+      "src_ui_top_bar_rs_ui",
+      "src_ui_widgets",
+      "src_ui_widgets_icon_button",
+      "src_ui_widgets_pill_button",
+      "src_ui_widgets_rs_ui"
+    ],
+    "2": [
+      "bytes",
+      "rect",
+      "src_app_goosemodmanager_page_mods",
+      "src_models_modentry",
+      "src_models_modentry_new",
+      "src_models_rs_option",
+      "src_models_rs_self",
+      "src_models_rs_string",
+      "src_ui_grid",
+      "src_ui_grid_paint_card",
+      "src_ui_grid_render_grid",
+      "src_ui_grid_rs_painter",
+      "src_ui_grid_rs_ui"
+    ],
+    "3": [
+      "color32",
+      "src_icons",
+      "src_icons_paint_download_icon",
+      "src_icons_paint_dropdown_arrow",
+      "src_icons_paint_left_arrow",
+      "src_icons_paint_right_arrow",
+      "src_icons_rs_painter",
+      "src_icons_rs_pos2"
+    ],
+    "4": [
+      "box",
+      "error",
+      "pathbuf",
+      "src_scraper",
+      "src_scraper_project_root",
+      "src_scraper_rs_result",
+      "src_scraper_run"
+    ],
+    "5": [
+      "src_models",
+      "src_models_sortoption",
+      "src_models_sortoption_all",
+      "src_models_sortoption_label",
+      "src_models_tab"
+    ],
+    "6": [
+      "src_main",
+      "src_main_main",
+      "src_main_rs_result"
+    ],
+    "7": [
+      "src_bin_scraper",
+      "src_bin_scraper_main"
+    ],
+    "8": [
+      "src_ui_mod"
+    ]
+  },
+  "cohesion": {
+    "0": 0.1503267973856209,
+    "1": 0.2571428571428571,
+    "2": 0.20512820512820512,
+    "3": 0.5714285714285714,
+    "4": 0.38095238095238093,
+    "5": 0.4,
+    "6": 0.6666666666666666,
+    "7": 1.0,
+    "8": 1.0
+  },
+  "gods": [
+    {
+      "id": "src_app_goosemodmanager",
+      "label": "GooseModManager",
+      "degree": 23
+    },
+    {
+      "id": "src_models_modentry",
+      "label": "ModEntry",
+      "degree": 10
+    },
+    {
+      "id": "src_ui_grid_paint_card",
+      "label": "paint_card()",
+      "degree": 8
+    },
+    {
+      "id": "src_ui_top_bar_render_sort_controls",
+      "label": "render_sort_controls()",
+      "degree": 8
+    },
+    {
+      "id": "src_ui_top_bar_render_top_bar",
+      "label": "render_top_bar()",
+      "degree": 7
+    },
+    {
+      "id": "src_ui_widgets_icon_button",
+      "label": "icon_button()",
+      "degree": 7
+    },
+    {
+      "id": "src_icons_paint_left_arrow",
+      "label": "paint_left_arrow()",
+      "degree": 5
+    },
+    {
+      "id": "src_icons_paint_right_arrow",
+      "label": "paint_right_arrow()",
+      "degree": 5
+    },
+    {
+      "id": "src_icons_paint_dropdown_arrow",
+      "label": "paint_dropdown_arrow()",
+      "degree": 5
+    },
+    {
+      "id": "src_icons_paint_download_icon",
+      "label": "paint_download_icon()",
+      "degree": 5
+    }
+  ],
+  "surprises": [
+    {
+      "source": "GooseModManager",
+      "target": "Tab",
+      "source_files": [
+        "src/app.rs",
+        "src/models.rs"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities; peripheral node `Tab` unexpectedly reaches hub `GooseModManager`"
+    },
+    {
+      "source": "icon_button()",
+      "target": "paint_left_arrow()",
+      "source_files": [
+        "src/ui/widgets.rs",
+        "src/icons.rs"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "icon_button()",
+      "target": "paint_right_arrow()",
+      "source_files": [
+        "src/ui/widgets.rs",
+        "src/icons.rs"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "render_sort_controls()",
+      "target": "paint_dropdown_arrow()",
+      "source_files": [
+        "src/ui/top_bar.rs",
+        "src/icons.rs"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "paint_card()",
+      "target": "paint_download_icon()",
+      "source_files": [
+        "src/ui/grid.rs",
+        "src/icons.rs"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `GooseModManager` connect `Community 0` to `Community 1`, `Community 2`, `Community 5`?",
+      "why": "High betweenness centrality (0.387) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `ModEntry` connect `Community 2` to `Community 0`, `Community 5`?",
+      "why": "High betweenness centrality (0.139) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `render_sort_controls()` connect `Community 1` to `Community 0`, `Community 3`?",
+      "why": "High betweenness centrality (0.109) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 2 inferred relationships involving `paint_card()` (e.g. with `paint_download_icon()` and `poppins_sm()`) actually correct?",
+      "why": "`paint_card()` has 2 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 3 inferred relationships involving `render_sort_controls()` (e.g. with `paint_dropdown_arrow()` and `poppins()`) actually correct?",
+      "why": "`render_sort_controls()` has 3 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 3 inferred relationships involving `render_top_bar()` (e.g. with `poppins()` and `icon_button()`) actually correct?",
+      "why": "`render_top_bar()` has 3 INFERRED edges - model-reasoned connections that need verification."
+    }
+  ]
+}

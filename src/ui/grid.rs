@@ -1,11 +1,13 @@
-use eframe::egui::{self, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Vec2};
 use crate::app::GooseModManager;
-use crate::models::ModEntry;
-use crate::theme::{CARD_BG, CARD_BG_HOVER, CARD_RADIUS, FOCUS_COLOR, ICON_COLOR, TEXT_WHITE, poppins_sm};
 use crate::icons::paint_download_icon;
+use crate::models::ModEntry;
+use crate::theme::{
+    CARD_BG, CARD_BG_HOVER, CARD_RADIUS, FOCUS_COLOR, ICON_COLOR, TEXT_WHITE, poppins_sm,
+};
+use eframe::egui::{self, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Vec2};
 
 pub fn render_grid(app: &GooseModManager, ui: &mut egui::Ui) {
-    let page_mods = app.page_mods().to_vec();
+    let page_mods = app.page_mods();
     let available = ui.available_size();
     let gap = 10.0;
     let padding = 10.0;
@@ -16,7 +18,7 @@ pub fn render_grid(app: &GooseModManager, ui: &mut egui::Ui) {
     let origin = ui.cursor().min + Vec2::new(padding, padding);
 
     // Collect interaction data first (mutable borrows for allocate_rect)
-    let mut card_data: Vec<(Rect, bool, bool, ModEntry)> = Vec::new();
+    let mut card_data: Vec<(Rect, bool, bool, usize)> = Vec::new();
     for row in 0..app.rows {
         for col in 0..app.cols {
             let idx = row * app.cols + col;
@@ -32,14 +34,21 @@ pub fn render_grid(app: &GooseModManager, ui: &mut egui::Ui) {
             if is_hovered {
                 ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
             }
-            card_data.push((card_rect, is_hovered, has_focus, page_mods[idx].clone()));
+            card_data.push((card_rect, is_hovered, has_focus, idx));
         }
     }
 
     // Paint all cards (needs both painter and ui for image rendering)
-    for (rect, is_hovered, has_focus, mod_entry) in &card_data {
+    for (rect, is_hovered, has_focus, idx) in &card_data {
         let painter = ui.painter().clone();
-        paint_card(app, &painter, ui, *rect, *is_hovered, *has_focus, mod_entry);
+        paint_card(
+            &painter,
+            ui,
+            *rect,
+            *is_hovered,
+            *has_focus,
+            &page_mods[*idx],
+        );
     }
 
     // Reserve the space
@@ -47,7 +56,6 @@ pub fn render_grid(app: &GooseModManager, ui: &mut egui::Ui) {
 }
 
 fn paint_card(
-    _app: &GooseModManager,
     painter: &egui::Painter,
     ui: &mut egui::Ui,
     rect: Rect,
@@ -79,39 +87,44 @@ fn paint_card(
         se: 0,
     };
 
-    // Use egui::Image with include_bytes or dynamic bytes
-    let image = if let Some(ref bytes) = mod_entry.image_bytes {
-        egui::Image::new(egui::ImageSource::Bytes {
-            uri: mod_entry.url.clone().into(), // using url as a unique uri
-            bytes: bytes.clone(),
-        })
-    } else {
-        egui::Image::new(egui::ImageSource::Bytes {
-            uri: "bytes://card_image.png".into(),
-            bytes: egui::load::Bytes::Static(include_bytes!("../../assets/card_image.png")),
-        })
-    };
+    // Use egui::Image with include_bytes or dynamic bytes.
+    // The bytes:// URI must include a file extension (.jpg, .png) so
+    // egui_extras can pick the right decoder.
+    let image =
+        if let (Some(bytes), Some(thumb)) = (&mod_entry.image_bytes, &mod_entry.thumbnail_path) {
+            let filename = thumb.rsplit('/').next().unwrap_or("thumb.jpg");
+            egui::Image::new(egui::ImageSource::Bytes {
+                uri: format!("bytes://{}", filename).into(),
+                bytes: bytes.clone(),
+            })
+        } else {
+            egui::Image::new(egui::ImageSource::Bytes {
+                uri: "bytes://card_image.png".into(),
+                bytes: egui::load::Bytes::Static(include_bytes!("../../assets/card_image.png")),
+            })
+        };
 
     // Cover crop: calculate UV to fill the rect without stretching,
     // cropping excess from the center (like CSS object-fit: cover)
     let rect_aspect = image_rect.width() / image_rect.height();
-    let cropped_image = if let Some(natural_size) = image.load_and_calc_size(ui, Vec2::splat(f32::INFINITY)) {
-        let img_aspect = natural_size.x / natural_size.y;
-        let uv = if img_aspect > rect_aspect {
-            // Image is wider — crop sides
-            let visible = rect_aspect / img_aspect;
-            let off = (1.0 - visible) / 2.0;
-            Rect::from_min_max(Pos2::new(off, 0.0), Pos2::new(1.0 - off, 1.0))
+    let cropped_image =
+        if let Some(natural_size) = image.load_and_calc_size(ui, Vec2::splat(f32::INFINITY)) {
+            let img_aspect = natural_size.x / natural_size.y;
+            let uv = if img_aspect > rect_aspect {
+                // Image is wider — crop sides
+                let visible = rect_aspect / img_aspect;
+                let off = (1.0 - visible) / 2.0;
+                Rect::from_min_max(Pos2::new(off, 0.0), Pos2::new(1.0 - off, 1.0))
+            } else {
+                // Image is taller — crop top/bottom
+                let visible = img_aspect / rect_aspect;
+                let off = (1.0 - visible) / 2.0;
+                Rect::from_min_max(Pos2::new(0.0, off), Pos2::new(1.0, 1.0 - off))
+            };
+            image.uv(uv)
         } else {
-            // Image is taller — crop top/bottom
-            let visible = img_aspect / rect_aspect;
-            let off = (1.0 - visible) / 2.0;
-            Rect::from_min_max(Pos2::new(0.0, off), Pos2::new(1.0, 1.0 - off))
+            image // fallback while loading
         };
-        image.uv(uv)
-    } else {
-        image // fallback while loading
-    };
 
     cropped_image
         .corner_radius(top_rounding)
@@ -132,8 +145,9 @@ fn paint_card(
         egui::Label::new(
             egui::RichText::new(&mod_entry.name)
                 .font(poppins_sm())
-                .color(TEXT_WHITE)
-        ).truncate()
+                .color(TEXT_WHITE),
+        )
+        .truncate(),
     );
 
     // Bottom row
@@ -151,13 +165,4 @@ fn paint_card(
     // Download icon
     let icon_center = Pos2::new(rect.right() - info_padding - 12.0, bottom_y);
     paint_download_icon(painter, icon_center, 20.0, ICON_COLOR);
-
-    // Size
-    painter.text(
-        Pos2::new(icon_center.x - 22.0, bottom_y),
-        egui::Align2::RIGHT_CENTER,
-        &mod_entry.size,
-        poppins_sm(),
-        TEXT_WHITE,
-    );
 }

@@ -2,6 +2,7 @@ use crate::models::{ModEntry, SortOption, Tab};
 use crate::theme::{BG_DARK, TEXT_WHITE};
 use crate::ui;
 use eframe::egui::{self, Frame, Margin, Vec2};
+use std::thread::JoinHandle;
 
 pub struct GooseModManager {
     pub active_tab: Tab,
@@ -13,23 +14,17 @@ pub struct GooseModManager {
     pub rows: usize,
     pub needs_initial_focus: bool,
     pub gilrs: gilrs::Gilrs,
+    scrape_task: Option<JoinHandle<Result<Vec<ModEntry>, String>>>,
 }
 
 impl Default for GooseModManager {
     fn default() -> Self {
-        let mut mods = if let Ok(data) = std::fs::read_to_string("mods.json") {
-            let mut parsed: Vec<ModEntry> = serde_json::from_str(&data).unwrap_or_default();
-            for m in parsed.iter_mut() {
-                if let Some(ref path) = m.thumbnail_path {
-                    if let Ok(bytes) = std::fs::read(path) {
-                        m.image_bytes = Some(egui::load::Bytes::Shared(bytes.into()));
-                    }
-                }
-            }
-            parsed
-        } else {
-            Vec::new() // Fallback if no database exists
-        };
+        let mods = Self::load_mods();
+        let scrape_task = Some(std::thread::spawn(|| {
+            crate::scraper::run()
+                .map_err(|error| error.to_string())
+                .map(|_| Self::load_mods())
+        }));
 
         Self {
             active_tab: Tab::Browse,
@@ -41,11 +36,45 @@ impl Default for GooseModManager {
             rows: 2,
             needs_initial_focus: true,
             gilrs: gilrs::Gilrs::new().unwrap(),
+            scrape_task,
         }
     }
 }
 
 impl GooseModManager {
+    fn load_mods() -> Vec<ModEntry> {
+        let json_path = format!("{}/mods.json", env!("CARGO_MANIFEST_DIR"));
+        if let Ok(data) = std::fs::read_to_string(json_path) {
+            let mut parsed: Vec<ModEntry> = serde_json::from_str(&data).unwrap_or_default();
+            for m in parsed.iter_mut() {
+                if let Some(ref path) = m.thumbnail_path {
+                    if let Ok(bytes) = std::fs::read(path) {
+                        m.image_bytes = Some(egui::load::Bytes::Shared(bytes.into()));
+                    }
+                }
+            }
+            parsed
+        } else {
+            Vec::new()
+        }
+    }
+
+    fn refresh_after_scrape(&mut self) {
+        let Some(task) = self.scrape_task.take() else { return };
+        if task.is_finished() {
+            match task.join() {
+                Ok(Ok(mods)) => {
+                    self.mods = mods;
+                    self.current_page = 0;
+                }
+                Ok(Err(error)) => eprintln!("Scraping failed: {error}"),
+                Err(_) => eprintln!("Scraping thread panicked"),
+            }
+        } else {
+            self.scrape_task = Some(task);
+        }
+    }
+
     pub fn total_pages(&self) -> usize {
         let items_per_page = (self.cols * self.rows).max(1);
         (self.mods.len() + items_per_page - 1) / items_per_page
@@ -61,6 +90,7 @@ impl GooseModManager {
 
 impl eframe::App for GooseModManager {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        self.refresh_after_scrape();
         let ctx = ui.ctx().clone();
         
         // ── GAMEPAD INPUT HANDLING ─────────────────────────────────────────
