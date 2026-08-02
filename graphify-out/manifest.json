@@ -35,9 +35,9 @@
     "semantic_hash": ""
   },
   "src/theme.rs": {
-    "mtime": 1785573414.8264964,
-    "ast_hash": "ea0c834da84654657b1be5d4375a6870",
-    "semantic_hash": "ea0c834da84654657b1be5d4375a6870"
+    "mtime": 1785666473.7785432,
+    "ast_hash": "2c69e2e257613a6ac1469a0977abdb8a",
+    "semantic_hash": ""
   },
   "src/ui/grid.rs": {
     "mtime": 1785664596.713346,
@@ -50,8 +50,8 @@
     "semantic_hash": "9600f0567d90ce73da341aa1430a4616"
   },
   "src/ui/top_bar.rs": {
-    "mtime": 1785651192.4215403,
-    "ast_hash": "3dd7c6597b275c1ab4b15170a9aa9ebe",
+    "mtime": 1785666043.610889,
+    "ast_hash": "9cc228497f96be9fdf23101e11881e3a",
     "semantic_hash": ""
   },
   "src/ui/widgets.rs": {

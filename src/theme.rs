@@ -1,14 +1,14 @@
 use eframe::egui::{Color32, FontFamily, FontId};
 
-// ── Colour palette (from Figma) ──────────────────────────────────────────────
-pub const BG_DARK: Color32 = Color32::from_rgb(0x27, 0x32, 0x3A);
-pub const CARD_BG: Color32 = Color32::from_rgb(0x43, 0x50, 0x55);
-pub const CARD_BG_HOVER: Color32 = Color32::from_rgb(0x4E, 0x5D, 0x63);
-pub const TEXT_WHITE: Color32 = Color32::from_rgb(0xFF, 0xFF, 0xFF);
-pub const ICON_COLOR: Color32 = Color32::from_rgb(0xE3, 0xE3, 0xE3);
-pub const TAB_ACTIVE: Color32 = Color32::from_rgb(0x43, 0x50, 0x55);
-pub const TAB_INACTIVE: Color32 = Color32::from_rgb(0x35, 0x42, 0x49);
-pub const FOCUS_COLOR: Color32 = Color32::from_rgb(0xA3, 0xF7, 0xBF);
+// ── Colour palette ──────────────────────────────────────────────────────────
+pub const BG_DARK: Color32 = Color32::from_rgb(0x0F, 0x0A, 0x05);
+pub const CARD_BG: Color32 = Color32::from_rgb(0x1F, 0x15, 0x0C);
+pub const CARD_BG_HOVER: Color32 = Color32::from_rgb(0x41, 0x2D, 0x15);
+pub const TEXT_WHITE: Color32 = Color32::from_rgb(0xE1, 0xDC, 0xC9);
+pub const ICON_COLOR: Color32 = Color32::from_rgb(0xE1, 0xDC, 0xC9);
+pub const TAB_ACTIVE: Color32 = Color32::from_rgb(0x41, 0x2D, 0x15);
+pub const TAB_INACTIVE: Color32 = Color32::from_rgb(0x1F, 0x15, 0x0C);
+pub const FOCUS_COLOR: Color32 = Color32::from_rgb(0xE1, 0xDC, 0xC9);
 
 // ── Dimensions ───────────────────────────────────────────────────────────────
 pub const PILL_HEIGHT: f32 = 52.0;

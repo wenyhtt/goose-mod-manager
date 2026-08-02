@@ -173,7 +173,7 @@ fn render_sort_controls(app: &mut GooseModManager, ui: &mut egui::Ui, top_right:
                 area_painter.rect_stroke(
                     menu_rect,
                     CornerRadius::same(12),
-                    Stroke::new(1.0, Color32::from_rgba_premultiplied(255, 255, 255, 30)),
+                        Stroke::new(1.0, Color32::from_rgba_premultiplied(0xE1, 0xDC, 0xC9, 30)),
                     StrokeKind::Outside,
                 );
 
