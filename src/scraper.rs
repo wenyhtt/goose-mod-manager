@@ -1,9 +1,9 @@
 use scraper::{Html, Selector};
+use std::collections::HashMap;
 use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
 use std::time::Duration;
-use std::collections::HashMap;
 
 use crate::models::ModEntry;
 
@@ -13,9 +13,26 @@ fn project_root() -> PathBuf {
     PathBuf::from(manifest)
 }
 
+pub fn cache_dir() -> PathBuf {
+    let home = || std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE"));
+    let base = if cfg!(target_os = "windows") {
+        std::env::var_os("LOCALAPPDATA")
+            .or_else(home)
+            .map(PathBuf::from)
+    } else if cfg!(target_os = "macos") {
+        home().map(|path| PathBuf::from(path).join("Library/Caches"))
+    } else {
+        std::env::var_os("XDG_CACHE_HOME")
+            .or_else(|| home().map(|path| PathBuf::from(path).join(".cache").into_os_string()))
+            .map(PathBuf::from)
+    };
+    base.unwrap_or_else(project_root)
+        .join("goose-mod-manager")
+}
+
 fn load_cached_mods() -> HashMap<String, ModEntry> {
-    let path = project_root().join("mods.json");
-    fs::read_to_string(path)
+    fs::read_to_string(cache_dir().join("mods.json"))
+        .or_else(|_| fs::read_to_string(project_root().join("mods.json")))
         .ok()
         .and_then(|data| serde_json::from_str::<Vec<ModEntry>>(&data).ok())
         .unwrap_or_default()
@@ -51,8 +68,7 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
 
     let mut mods = Vec::new();
     let cached_mods = load_cached_mods();
-    let root = project_root();
-    let thumb_dir = root.join("assets/thumbnails");
+    let thumb_dir = cache_dir().join("thumbnails");
     fs::create_dir_all(&thumb_dir)?;
 
     for element in document.select(&obj_selector) {
@@ -107,7 +123,7 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
                         .get(&img_src)
                         .send()
                         .and_then(|response| response.error_for_status())
-                        .and_then(|mut response| response.bytes())
+                        .and_then(|response| response.bytes())
                     {
                         if !bytes.is_empty() {
                             fs::write(&abs_path, &bytes)?;
@@ -130,7 +146,9 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
 }
 
 pub fn save_mods(mods: &[ModEntry]) -> Result<(), Box<dyn std::error::Error>> {
-    let json_path = project_root().join("mods.json");
+    let cache = cache_dir();
+    fs::create_dir_all(&cache)?;
+    let json_path = cache.join("mods.json");
     let json_data = serde_json::to_string_pretty(&mods)?;
     let mut file = fs::File::create(&json_path)?;
     file.write_all(json_data.as_bytes())?;

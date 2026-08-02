@@ -47,8 +47,11 @@ impl Default for GooseModManager {
 
 impl GooseModManager {
     fn load_mods() -> Vec<ModEntry> {
-        let json_path = format!("{}/mods.json", env!("CARGO_MANIFEST_DIR"));
-        if let Ok(data) = std::fs::read_to_string(json_path) {
+        let cached_path = crate::scraper::cache_dir().join("mods.json");
+        let legacy_path = format!("{}/mods.json", env!("CARGO_MANIFEST_DIR"));
+        if let Ok(data) = std::fs::read_to_string(cached_path)
+            .or_else(|_| std::fs::read_to_string(legacy_path))
+        {
             let mut parsed: Vec<ModEntry> = serde_json::from_str(&data).unwrap_or_default();
             for m in parsed.iter_mut() {
                 if let Some(ref path) = m.thumbnail_path {
