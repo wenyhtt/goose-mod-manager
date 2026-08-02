@@ -17,32 +17,19 @@ pub struct GooseModManager {
 
 impl Default for GooseModManager {
     fn default() -> Self {
-        let mods = vec![
-            ModEntry::new("Subaru Impreza WRX STI 2004", "Vehicle", "20.4MB"),
-            ModEntry::new("Toyota Supra MK4 RZ 1997", "Vehicle", "18.7MB"),
-            ModEntry::new("Nissan Skyline R34 GT-R V-Spec II", "Vehicle", "22.1MB"),
-            ModEntry::new("Mazda RX-7 FD Spirit R Type A", "Vehicle", "19.3MB"),
-            ModEntry::new("Honda NSX Type R 2002", "Vehicle", "17.8MB"),
-            ModEntry::new("Mitsubishi Lancer Evolution IX MR", "Vehicle", "21.5MB"),
-            ModEntry::new("BMW M3 E46 GTR 2001", "Vehicle", "23.0MB"),
-            ModEntry::new("Ford Mustang Shelby GT500", "Vehicle", "24.2MB"),
-            ModEntry::new("Porsche 911 GT3 RS 991.2", "Vehicle", "25.1MB"),
-            ModEntry::new("Lamborghini Murcielago LP670-4 SV", "Vehicle", "26.8MB"),
-            ModEntry::new("Ferrari F40 Competizione", "Vehicle", "19.9MB"),
-            ModEntry::new("Chevrolet Corvette C6 ZR1", "Vehicle", "20.0MB"),
-            ModEntry::new("Dodge Viper SRT-10 ACR", "Vehicle", "22.4MB"),
-            ModEntry::new("Audi R8 V10 Plus 2016", "Vehicle", "21.7MB"),
-            ModEntry::new("McLaren F1 LM 1995", "Vehicle", "18.2MB"),
-            ModEntry::new("Aston Martin DB9 Volante", "Vehicle", "20.6MB"),
-            ModEntry::new("Pagani Zonda R 2009", "Vehicle", "23.5MB"),
-            ModEntry::new("Koenigsegg CCX 2006", "Vehicle", "24.8MB"),
-            ModEntry::new("Bugatti Veyron Super Sport", "Vehicle", "27.3MB"),
-            ModEntry::new("Lexus LFA Nürburgring Package", "Vehicle", "21.0MB"),
-            ModEntry::new("Jaguar XJ220 1992", "Vehicle", "18.9MB"),
-            ModEntry::new("Mercedes-Benz SLR McLaren", "Vehicle", "22.8MB"),
-            ModEntry::new("Alfa Romeo 8C Competizione", "Vehicle", "19.5MB"),
-            ModEntry::new("Maserati MC12 Stradale", "Vehicle", "23.1MB"),
-        ];
+        let mut mods = if let Ok(data) = std::fs::read_to_string("mods.json") {
+            let mut parsed: Vec<ModEntry> = serde_json::from_str(&data).unwrap_or_default();
+            for m in parsed.iter_mut() {
+                if let Some(ref path) = m.thumbnail_path {
+                    if let Ok(bytes) = std::fs::read(path) {
+                        m.image_bytes = Some(egui::load::Bytes::Shared(bytes.into()));
+                    }
+                }
+            }
+            parsed
+        } else {
+            Vec::new() // Fallback if no database exists
+        };
 
         Self {
             active_tab: Tab::Browse,

@@ -1,16 +1,26 @@
-#[derive(Clone)]
+use serde::{Serialize, Deserialize};
+use eframe::egui;
+
+#[derive(Clone, Serialize, Deserialize)]
 pub struct ModEntry {
     pub name: String,
     pub category: String,
     pub size: String,
+    pub url: String,
+    pub thumbnail_path: Option<String>,
+    #[serde(skip)]
+    pub image_bytes: Option<egui::load::Bytes>,
 }
 
 impl ModEntry {
-    pub fn new(name: &str, category: &str, size: &str) -> Self {
+    pub fn new(name: &str, category: &str, size: &str, url: &str, thumbnail_path: Option<&str>) -> Self {
         Self {
             name: name.to_string(),
             category: category.to_string(),
             size: size.to_string(),
+            url: url.to_string(),
+            thumbnail_path: thumbnail_path.map(|s| s.to_string()),
+            image_bytes: None,
         }
     }
 }

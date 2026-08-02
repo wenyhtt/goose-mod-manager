@@ -79,11 +79,18 @@ fn paint_card(
         se: 0,
     };
 
-    // Use egui::Image with include_bytes via ImageSource::Bytes
-    let image = egui::Image::new(egui::ImageSource::Bytes {
-        uri: "bytes://card_image.png".into(),
-        bytes: egui::load::Bytes::Static(include_bytes!("../../assets/card_image.png")),
-    });
+    // Use egui::Image with include_bytes or dynamic bytes
+    let image = if let Some(ref bytes) = mod_entry.image_bytes {
+        egui::Image::new(egui::ImageSource::Bytes {
+            uri: mod_entry.url.clone().into(), // using url as a unique uri
+            bytes: bytes.clone(),
+        })
+    } else {
+        egui::Image::new(egui::ImageSource::Bytes {
+            uri: "bytes://card_image.png".into(),
+            bytes: egui::load::Bytes::Static(include_bytes!("../../assets/card_image.png")),
+        })
+    };
 
     // Cover crop: calculate UV to fill the rect without stretching,
     // cropping excess from the center (like CSS object-fit: cover)
