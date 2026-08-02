@@ -2,6 +2,7 @@ use scraper::{Html, Selector};
 use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
+use std::time::Duration;
 
 use crate::models::ModEntry;
 
@@ -12,9 +13,20 @@ fn project_root() -> PathBuf {
 }
 
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
-    let client = reqwest::blocking::Client::new();
+    let mods = run_page(1)?;
+    save_mods(&mods)
+}
+
+pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>> {
+    let client = reqwest::blocking::Client::builder()
+        .timeout(Duration::from_secs(10))
+        .build()?;
     let base_url = "https://www.gta5-mods.com";
-    let url = format!("{}/vehicles", base_url);
+    let url = if page == 1 {
+        format!("{}/vehicles", base_url)
+    } else {
+        format!("{}/vehicles/{}", base_url, page)
+    };
 
     println!("Fetching {}", url);
     let res = client.get(&url).send()?.text()?;
@@ -62,11 +74,16 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             } else {
                 let file_name = img_src.split('/').last().unwrap_or("thumb.jpg");
                 let abs_path = thumb_dir.join(file_name);
-                if !abs_path.exists() {
+                if !abs_path.exists() || fs::metadata(&abs_path).map(|m| m.len() == 0).unwrap_or(true) {
                     println!("Downloading thumbnail: {}", img_src);
-                    if let Ok(mut resp) = client.get(&img_src).send() {
-                        if let Ok(mut file) = fs::File::create(&abs_path) {
-                            let _ = std::io::copy(&mut resp, &mut file);
+                    if let Ok(bytes) = client
+                        .get(&img_src)
+                        .send()
+                        .and_then(|response| response.error_for_status())
+                        .and_then(|mut response| response.bytes())
+                    {
+                        if !bytes.is_empty() {
+                            fs::write(&abs_path, &bytes)?;
                         }
                     }
                 }
@@ -82,7 +99,11 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    let json_path = root.join("mods.json");
+    Ok(mods)
+}
+
+pub fn save_mods(mods: &[ModEntry]) -> Result<(), Box<dyn std::error::Error>> {
+    let json_path = project_root().join("mods.json");
     let json_data = serde_json::to_string_pretty(&mods)?;
     let mut file = fs::File::create(&json_path)?;
     file.write_all(json_data.as_bytes())?;

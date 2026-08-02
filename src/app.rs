@@ -14,16 +14,18 @@ pub struct GooseModManager {
     pub rows: usize,
     pub needs_initial_focus: bool,
     pub gilrs: gilrs::Gilrs,
-    scrape_task: Option<JoinHandle<Result<Vec<ModEntry>, String>>>,
+    scrape_task: Option<JoinHandle<Result<(usize, Vec<ModEntry>), String>>>,
+    next_scrape_page: usize,
+    has_more_scrape_pages: bool,
 }
 
 impl Default for GooseModManager {
     fn default() -> Self {
         let mods = Self::load_mods();
         let scrape_task = Some(std::thread::spawn(|| {
-            crate::scraper::run()
+            crate::scraper::run_page(1)
                 .map_err(|error| error.to_string())
-                .map(|_| Self::load_mods())
+                .map(|mods| (1, mods))
         }));
 
         Self {
@@ -37,6 +39,8 @@ impl Default for GooseModManager {
             needs_initial_focus: true,
             gilrs: gilrs::Gilrs::new().unwrap(),
             scrape_task,
+            next_scrape_page: 2,
+            has_more_scrape_pages: true,
         }
     }
 }
@@ -63,16 +67,57 @@ impl GooseModManager {
         let Some(task) = self.scrape_task.take() else { return };
         if task.is_finished() {
             match task.join() {
-                Ok(Ok(mods)) => {
-                    self.mods = mods;
-                    self.current_page = 0;
+                Ok(Ok((page, mods))) => {
+                    let found_mods = !mods.is_empty();
+                    if page == 1 {
+                        self.mods = mods;
+                        self.current_page = 0;
+                    } else {
+                        let existing = self
+                            .mods
+                            .iter()
+                            .map(|m| m.url.clone())
+                            .collect::<std::collections::HashSet<_>>();
+                        self.mods
+                            .extend(mods.into_iter().filter(|m| !existing.contains(&m.url)));
+                    }
+                    self.next_scrape_page = page + 1;
+                    self.has_more_scrape_pages = found_mods;
+                    if let Err(error) = crate::scraper::save_mods(&self.mods) {
+                        eprintln!("Saving scraped mods failed: {error}");
+                    } else {
+                        self.mods = Self::load_mods();
+                    }
                 }
-                Ok(Err(error)) => eprintln!("Scraping failed: {error}"),
-                Err(_) => eprintln!("Scraping thread panicked"),
+                Ok(Err(error)) => {
+                    self.has_more_scrape_pages = false;
+                    eprintln!("Scraping failed: {error}");
+                }
+                Err(_) => {
+                    self.has_more_scrape_pages = false;
+                    eprintln!("Scraping thread panicked");
+                }
             }
         } else {
             self.scrape_task = Some(task);
         }
+    }
+
+    fn refresh_scrape_if_needed(&mut self) {
+        if self.scrape_task.is_some()
+            || !self.has_more_scrape_pages
+            || self.current_page + 1 >= self.total_pages()
+            || self.current_page + 3 < self.total_pages()
+        {
+            return;
+        }
+
+        let page = self.next_scrape_page;
+        self.scrape_task = Some(std::thread::spawn(move || {
+            crate::scraper::run_page(page)
+                .map(|mods| (page, mods))
+                .map_err(|error| error.to_string())
+        }));
     }
 
     pub fn total_pages(&self) -> usize {
@@ -82,7 +127,8 @@ impl GooseModManager {
 
     pub fn page_mods(&self) -> &[ModEntry] {
         let items_per_page = (self.cols * self.rows).max(1);
-        let start = self.current_page * items_per_page;
+        let page = self.current_page.min(self.total_pages().saturating_sub(1));
+        let start = page * items_per_page;
         let end = (start + items_per_page).min(self.mods.len());
         &self.mods[start..end]
     }
@@ -91,6 +137,7 @@ impl GooseModManager {
 impl eframe::App for GooseModManager {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         self.refresh_after_scrape();
+        self.refresh_scrape_if_needed();
         let ctx = ui.ctx().clone();
         
         // ── GAMEPAD INPUT HANDLING ─────────────────────────────────────────
@@ -227,6 +274,7 @@ impl eframe::App for GooseModManager {
 
                 self.cols = ((content_w + gap) / (min_w + gap)).floor().max(1.0) as usize;
                 self.rows = ((content_h + gap) / (min_h + gap)).floor().max(1.0) as usize;
+                self.current_page = self.current_page.min(self.total_pages().saturating_sub(1));
 
                 // ── TOP BAR ──────────────────────────────────────────
                 ui::top_bar::render_top_bar(self, ui);

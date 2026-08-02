@@ -118,5 +118,485 @@
     "category": "Bike",
     "url": "https://www.gta5-mods.com/vehicles/ubermatch-rebell-1000-adv",
     "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/eb8eef-1.png"
+  },
+  {
+    "name": "Declasse Merit LX (lore-friendly '86-'90 Chevrolet Caprice)",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/declasse-merit-lx-lore-friendly-86-90-chevrolet-caprice",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/bba6a5-1.png"
+  },
+  {
+    "name": "Übermacht Sentinel Stock [Add-On]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/ubermacht-sentinel-stock-add-on",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/e95301-4.png"
+  },
+  {
+    "name": "Nissan Patrol 2025 [Add-on | FiveM | Tuning | Debadged]",
+    "category": "SUV",
+    "url": "https://www.gta5-mods.com/vehicles/nissan-patrol-2025-add-on-fivem-tuning-debadged-omardr",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/e8e32c-1.png"
+  },
+  {
+    "name": "Übermacht Sentinel S [Replace | Add-On]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/ubermacht-sentinel-s-replace",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/8f88ab-271590_491.jpg"
+  },
+  {
+    "name": "Mercedes Benz AMG CLS 63 S [Add-On | Legacy | Enhanced]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/mercedes-benz-amg-cls-63-s-add-on-legacy-enhanced",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/e5a61a-2.jpg"
+  },
+  {
+    "name": "9P157 Khrizantema-S Tank Destroyer [Add-On]",
+    "category": "Tank",
+    "url": "https://www.gta5-mods.com/vehicles/9p157-khrizantema-s-tank-destroyer-mod",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/14e96a-1.jpg"
+  },
+  {
+    "name": "Vanilla Taxi, edited without ads",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/taxi-wthout-ads-enhanced",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/0dc72e-Taxi.jpg"
+  },
+  {
+    "name": "Dewbauchee Strage [Add-On/FiveM | Tuning | LODs]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/dewbachee-strage-fivem-add-on-tuning-lods-sounds",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/f6363b-FiveM_GTAProcess2025-02-0316-30-26.jpg"
+  },
+  {
+    "name": "Iconic cars collection [Menyoo]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/iconic-cars-collection-menyoo-required",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/222774-271590_93.jpg"
+  },
+  {
+    "name": "1969 Ford Mustang Boss 302 and Mach1 Pack [Add-On | Template]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/1969-ford-mustang-boss302-pack-addon-template",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/dbac54-20.png"
+  },
+  {
+    "name": "2025 Ferrari F80 Blue Carbon Exposed [Add-On | Extras] [Animated Spoiler]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2025-ferrari-f80-blue-carbon-exposed-add-on-extras-animated-spoiler",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/19ee8f-1.png"
+  },
+  {
+    "name": "2025 Ferrari F80 Full Carbon Exposed [Add-On | Extras] [Animated Spoiler]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2025-ferrari-f80-full-carbon-exposed-add-on-extras",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/d77a27-1.png"
+  },
+  {
+    "name": "Karin Asterope Standard [Add-On | Legacy | Enhanced]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/karin-asterope-standard",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/cfd74f-1.jpg"
+  },
+  {
+    "name": "Improved Vapid Speedo [Add-On | Replace | Liveries | Legacy | Enhanced]",
+    "category": "Vanilla Edit",
+    "url": "https://www.gta5-mods.com/vehicles/improved-vapid-speedo-replace-add-on-liveries",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/48fa56-1.jpg"
+  },
+  {
+    "name": "Vapid Stanier 2nd Generation [Add-On | Legacy | Enhanced]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/vapid-stanier-add-on",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/ff19ea-1.jpg"
+  },
+  {
+    "name": "Cheval Surge Arrester [Add-On | Legacy | Enhanced]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/cheval-surge-arrester-add-on",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/a0c784-1.jpg"
+  },
+  {
+    "name": "Gallivanter Warden Colorable Roof [Legacy]",
+    "category": "Vanilla Edit",
+    "url": "https://www.gta5-mods.com/vehicles/gallivanter-warden-colorable-roof",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/50cd76-r%C3%A1gner%C3%B3vr.jpg"
+  },
+  {
+    "name": "2015 Bentley Continental GT3-R [Add-On | Extras]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2015-bentley-continental-gt3-r-add-on-extras",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/502327-1.png"
+  },
+  {
+    "name": "HQ-16 SAM China [Add-On]",
+    "category": "Truck",
+    "url": "https://www.gta5-mods.com/vehicles/hq-16-sam-china",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/3dea0a-2.jpg"
+  },
+  {
+    "name": "Me 262 HG III [Add-On]",
+    "category": "Aircraft",
+    "url": "https://www.gta5-mods.com/vehicles/me-262-hg-iii",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/2cc3b9-1.jpg"
+  },
+  {
+    "name": "BMW M4 F82 [Add-On | Legacy | Enhanced]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/bmw-m4-f82-add-on-legacy-enhanced",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/30d4f3-1.jpg"
+  },
+  {
+    "name": "Knoway Ocelot E-Stride",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/knoway-ocelot-e-stride",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/8bcb78-1.jpg"
+  },
+  {
+    "name": "2025 Ferrari F80 [Add-On | Extras] [Animated Spoiler]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2025-ferrari-f80-add-on-extras-c0bc02fb-3d7e-4d37-86d1-37f64c4d6903",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/2a59dd-1.png"
+  },
+  {
+    "name": "Realistic Car Damage With Better Deformation For DLC Vehicles",
+    "category": "Handling",
+    "url": "https://www.gta5-mods.com/vehicles/realistic-car-damage-with-better-deformation-for-dlc-vehicles",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/d7b0e2-1.png"
+  },
+  {
+    "name": "2026 Lamborghini Fenomeno [Add-On | Extras]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2026-lamborghini-fenomeno-add-on-extras",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/5ae3b3-1.png"
+  },
+  {
+    "name": "Warrener Custom [Add-On | Tuning | Template]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/warrener-custom-add-on-tuning-template",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/0271a3-warrc1.jpg"
+  },
+  {
+    "name": "CBR1000RR-R motoGP Lean Angle",
+    "category": "Handling",
+    "url": "https://www.gta5-mods.com/vehicles/cbr1000rr-r-motogp-lean-angle",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/5219f2-PGTA51930607692.jpg"
+  },
+  {
+    "name": "2024 Suzuki GSX-8R [Add-On | Tuning]",
+    "category": "Bike",
+    "url": "https://www.gta5-mods.com/vehicles/2024-suzuki-gsx-8r-add-on-tuning",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/b467e2-1.jpg"
+  },
+  {
+    "name": "SVR Lamborghini Aventador Auto Veloce & Lamborghini Aventador LP780-4 Ultimae [Add-On | Legacy | Enhanced]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/svr-lamborghini-aventador-auto-veloce-lamborghini-aventador-lp780-4-ultimae-add-on-legacy-enhanced",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/459698-1.jpg"
+  },
+  {
+    "name": "2026 Lamborghini Fenomeno [Add-On]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2026-lamborghini-fenomeno-add-on",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/e47e9b-5478.jpg"
+  },
+  {
+    "name": "Fast & Furious 1 Lore Friendly car pack [Menyoo]",
+    "category": "Vanilla Edit",
+    "url": "https://www.gta5-mods.com/vehicles/fast-furious-1-lore-friendly-car-pack-diablo317",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/c0841a-Picture1.jpg"
+  },
+  {
+    "name": "2018 Mercedes-Benz S63 AMG Coupe [Add-On | Extras]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2018-mercedes-benz-s63-amg-coupe-add-on-extras-dav7ku",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/12978f-1.png"
+  },
+  {
+    "name": "1990s Orange County, CA Sheriff's Caprice Minipack",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/1990s-orange-county-ca-sheriff-s-caprice-minipack",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/f60026-20260707135822_1.jpg"
+  },
+  {
+    "name": "2020 Mercedes-Benz AMG GT Black Series [Add-On | Template]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2020-mercedes-benz-amg-gt-black-series-add-on-lods-template",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/49a33d-85.jpg"
+  },
+  {
+    "name": "2019 skoda octavia rs estate",
+    "category": "SUV",
+    "url": "https://www.gta5-mods.com/vehicles/2019-skoda-octavia-rs-estate",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/5bebd8-v1.jpg"
+  },
+  {
+    "name": "2024 BMW X6M Competition [Add-On | Tuning | Legacy | Enhanced]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2024-bmw-x6m-competition-add-on-tuning-legacy-enhanced",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/e185fc-1.jpg"
+  },
+  {
+    "name": "Nissan GTR (R35) GT3 2018 [Add-On / FiveM / Tuning / Template]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/nissan-gtr-r35-gt3-2018",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/70aedb-GTR%281%29.jpg"
+  },
+  {
+    "name": "1995 Ferrari F50 [Add-On | Extras]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/1995-ferrari-f50-add-on-extras",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/469460-1.png"
+  },
+  {
+    "name": "2023 Toyota Crown Kluger",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/23-toyota-crown-kluger",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/b14d3e-hghld.jpg"
+  },
+  {
+    "name": "2023 GMC Yukon Denali [Add-On]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/23-gmc-yukon-denali",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/8877c8-gmc.jpg"
+  },
+  {
+    "name": "Ferrari Daytona SP3  [Add-On | Legacy | Enhanced]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/ferrari-daytona-sp3-add-on",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/7a7c2f-1.jpg"
+  },
+  {
+    "name": "Mclaren 720S GT3 Evo [Add-On / FiveM / Tuning / Template]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/mclaren-720s-gt3-evo-add-on-fivem-tuning-template",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/c46af1-1.png"
+  },
+  {
+    "name": "Ford Mustang GT3 [Add-On / FiveM / Tuning / Template]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/ford-mustang-gt3-add-on-fivem-tuning-template",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/321414-1.png"
+  },
+  {
+    "name": "Ferrari 296 GT3 [Add-On / Tuning / Template]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/ferrari-296-gt3-evo-add-on-fivem-tuning-template",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/c132e4-1.png"
+  },
+  {
+    "name": "Improved Bobcat XL [Replace | Legacy | Enhanced]",
+    "category": "Truck",
+    "url": "https://www.gta5-mods.com/vehicles/improved-bobcat-xl-replace-legacy-enhanced",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/9dcc43-1.jpg"
+  },
+  {
+    "name": "2012 Chevrolet Corvette C6 ZR1 [Add-on]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2012-chevrolet-corvette-c6-zr1-add-on",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/9e68a2-7659505454861146437.png"
+  },
+  {
+    "name": "BMW X6 M [Add-On | Legacy | Enhanced]",
+    "category": "SUV",
+    "url": "https://www.gta5-mods.com/vehicles/bmw-x6-m-add-on-legacy-enhanced",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/eedf8f-23.jpg"
+  },
+  {
+    "name": "Tuned Lancer Evo 10 - Engine Sound [Add-On / FiveM | Sound]",
+    "category": "Sound",
+    "url": "https://www.gta5-mods.com/vehicles/tuned-lancer-evo-10-engine-sound-add-on-fivem-sound",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/41ef07-1ac6612fddd05b5621c371c900a7a75d.jpg"
+  },
+  {
+    "name": "MotoGP Bike Lean- Scrape them Knees!",
+    "category": "Bike",
+    "url": "https://www.gta5-mods.com/vehicles/motogp-bike-lean-scrape-them-knees",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/61c3c9-BikeLean.png"
+  },
+  {
+    "name": "2024 Kimera EVO38 [Add-on]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2024-kimera-evo38-add-on",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/afe450-EE945376B6D9D389C091E90970E10E95.png"
+  },
+  {
+    "name": "2017 Alfa Romeo Giulia Quadrifoglio [Add-On | Template | Tuning]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2017-alfa-romeo-giulia-quadrifoglio-addon-template-tuning",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/d7ec38-GTA5_2023-09-06_09-06-02.png"
+  },
+  {
+    "name": "2016 BMW M3 (F80) [Add-On | 140+ Tuning | Wheels | Template]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2015-bmw-m3-f80-add-on-tuning-analog-digital-dials",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/c3c625-1.jpg"
+  },
+  {
+    "name": "Pfister | Astron GT Monarch [Add-On/FiveM]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/pfister-astron-gt-monarch-add-on-fivem",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/2a49ad-edbe9a-299e02d9-f1e0-484a-b02f-ef5c09473045_1920x1080.jpg"
+  },
+  {
+    "name": "Dodge Viper GTS V10 8.4L - Engine Sound [Add-On / FiveM | Sound]",
+    "category": "Sound",
+    "url": "https://www.gta5-mods.com/vehicles/dodge-viper-gts-v10-8-4l-engine-sound-add-on-fivem-sound",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/779bf0-images.jpg"
+  },
+  {
+    "name": "2027 Audi RS5 Sportback (B10) [Add-On | Animated Lights | Tuning]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2027-audi-rs5-sportback-b10-add-on-animated-lights",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/e62028-1.jpg"
+  },
+  {
+    "name": "Toyota GR GT [Add-On / Replace | GT3 Tuning | Template | LODS]",
+    "category": "Toyota",
+    "url": "https://www.gta5-mods.com/vehicles/toyota-gr-gt-add-on-replace-gt3-tuning-template-lods",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/e7d021-14.png"
+  },
+  {
+    "name": "Cyber-Dominator SMC [Add-On | Tuning | Template]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/cyber-dominator-smc-add-on-tuning-template",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/4b0d98-dom2.jpg"
+  },
+  {
+    "name": "Dundreary Regina Patriot 250 Edition [Add-On | FiveM]",
+    "category": "Lore Friendly",
+    "url": "https://www.gta5-mods.com/vehicles/dundreary-regina-patriot-250-edition-singleplayer-fivem",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/12452f-20260704130153_1.jpg"
+  },
+  {
+    "name": "2010 Ford Crown Victoria Police Interceptor - Blaine County Sheriff's Office (BCSO) [Add-On / Replace | DLS / non-ELS]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2010-ford-crown-victoria-police-interceptor-blaine-county-sheriff-s-office-bcso-add-on-replace-dls-non-els",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/72f451-pic1.jpg"
+  },
+  {
+    "name": "2008 Ford Crown Victoria Police Interceptor - LSPD (LAPD) Pack [Add-On / Replace | DLS / non-ELS]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2008-ford-crown-victoria-police-interceptor-lspd-lapd-pack-add-on-replace-dls-non-els",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/54efbb-pic1.jpg"
+  },
+  {
+    "name": "Invetero Coquette Riptide [Add-On | Tuning | Liveries]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/invetero-coquette-riptide-add-on-tuning-liveries",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/3eae5a-jshworks1.png"
+  },
+  {
+    "name": "2016 Ferrari F12 TDF [Add-On | Template]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2016-ferrari-f12-tdf-add-on-template",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/ae8282-679.jpg"
+  },
+  {
+    "name": "Ariel Atom V8 - Engine Sound [Add-On / FiveM | Sound]",
+    "category": "Sound",
+    "url": "https://www.gta5-mods.com/vehicles/ariel-atom-v8-engine-sound-add-on-fivem-sound",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/708b77-Atom-V8-engine-bay-scaled.jpg"
+  },
+  {
+    "name": "Ariel Atom i4 - Engine Sound [Add-On / FiveM | Sound]",
+    "category": "Sound",
+    "url": "https://www.gta5-mods.com/vehicles/ariel-atom-i4-engine-sound-add-on-fivem-sound",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/a5c25b-Ariel-Atom-4-motor-1100x733.jpg"
+  },
+  {
+    "name": "2026 Toyota GR GT [Add-On | Tuning | Legacy | Enhanced]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2026-toyota-gr-gt",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/220c67-1.jpg"
+  },
+  {
+    "name": "Colorable Cyclorama [Add-On / FiveM]",
+    "category": "Lore Friendly",
+    "url": "https://www.gta5-mods.com/vehicles/colorable-cyclorama-add-on-fivem",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/5cb2b0-harcyc%282%29.png"
+  },
+  {
+    "name": "Tuned Mazda RX-7 FD Engine Sound [Add-On / FiveM | Sound]",
+    "category": "Sound",
+    "url": "https://www.gta5-mods.com/vehicles/tuned-mazda-rx-7-fd-engine-sound-add-on-fivem-sound",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/95668c-images.jpg"
+  },
+  {
+    "name": "Mazda RX-7 13B-REW Engine Sound [Add-On / FiveM | Sound]",
+    "category": "Sound",
+    "url": "https://www.gta5-mods.com/vehicles/mazda-rx-7-13b-rew-engine-sound-add-on-fivem-sound-streiter_v12",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/a05f40-0e8fba-Screensho5112.png"
+  },
+  {
+    "name": "Benetton B199 V10 - Formula 1 - Engine Sound [Add-On / FiveM | Sound]",
+    "category": "Sound",
+    "url": "https://www.gta5-mods.com/vehicles/benetton-b199-v10-formula-1-engine-sound-add-on-fivem-sound",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/abd26f-799297.jpg"
+  },
+  {
+    "name": "Mercedes-Benz Citaro MegaPack",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/mercedes-benz-citaro-megapack",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/030d68-0.jpg"
+  },
+  {
+    "name": "Ford F-450 Twin Turbo [Add-On | Legacy | Enhanced]",
+    "category": "Truck",
+    "url": "https://www.gta5-mods.com/vehicles/ford-f-450-twin-turbo-add-on-legacy-enhanced",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/776dcc-1.jpg"
+  },
+  {
+    "name": "BMW M5 G90 [Add-On | Legacy | Enhanced]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/bmw-m5-g90-add-on-legacy-enhanced",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/e4c9c3-1.jpg"
+  },
+  {
+    "name": "Class A Transport (Special Railway Transport) Japanese: Kousyuyusou",
+    "category": "Script",
+    "url": "https://www.gta5-mods.com/vehicles/class-a-transport-special-railway-transport",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/ee1aa4-%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%8844.jpg"
+  },
+  {
+    "name": "Nahman Vehicle",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/nahman-vehicle",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/c26b39-nahman1.png"
+  },
+  {
+    "name": "2020 Toyota Kijang Innova (AN140) [Add-On]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2020-toyota-kijang-innova-an140-add-on",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/f8217e-image7.png"
+  },
+  {
+    "name": "Lampadati Rossati [Add-on | Tuning | Liveries | Template | Legacy]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/lampadati-rossati-add-on-tuning-liveries-template-legacy",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/1c02ef-1.jpg"
+  },
+  {
+    "name": "drift handling",
+    "category": "Handling",
+    "url": "https://www.gta5-mods.com/vehicles/handling-smokey",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/b063fa-Jun-2-2026-Clip-0017.jpg"
+  },
+  {
+    "name": "2024 Rolls Royce Ghost Series II [Add-On | Extras] [Animated statue]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2024-rolls-royce-ghost-series-ii-add-on-extras-animated-statue",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/e842c5-1.png"
+  },
+  {
+    "name": "2026 BMW M3 CS Touring [Add-On]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2026-bmw-m3-cs-touring-add-on-vertex-ao",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/a671d1-078.jpg"
+  },
+  {
+    "name": "2010 BMW M6 E63 [Add-On l Tuning]",
+    "category": "Car",
+    "url": "https://www.gta5-mods.com/vehicles/2010-bmw-m6-e63-add-on-l-tuning",
+    "thumbnail_path": "/home/diaz/Projects/goose-mod-manager/assets/thumbnails/613e99-123113w.jpg"
   }
 ]
