@@ -190,9 +190,16 @@ fn paint_card(
         } else {
             format!("v{}", mod_entry.version)
         };
+        let text_size = painter
+            .layout_no_wrap(version.clone(), poppins_xs(), TEXT_WHITE)
+            .size();
+        let badge_size = text_size + Vec2::new(16.0, 8.0);
         let badge = Rect::from_min_size(
-            Pos2::new(image_rect.right() - 62.0, image_rect.bottom() - 32.0),
-            Vec2::new(58.0, 28.0),
+            Pos2::new(
+                image_rect.right() - badge_size.x - 4.0,
+                image_rect.bottom() - badge_size.y - 4.0,
+            ),
+            badge_size,
         );
         painter.rect_filled(badge, CornerRadius::same(14), CARD_BG);
         painter.text(

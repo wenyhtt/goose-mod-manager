@@ -30,8 +30,8 @@
     "semantic_hash": ""
   },
   "src/scraper.rs": {
-    "mtime": 1785673888.6293042,
-    "ast_hash": "add58c001209e0d4ec5d16c78c12a8ca",
+    "mtime": 1785675715.8264706,
+    "ast_hash": "3f0bd3e8d9693ef8c56a9d1fc32048cb",
     "semantic_hash": ""
   },
   "src/theme.rs": {
@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "src/ui/grid.rs": {
-    "mtime": 1785675585.7524025,
-    "ast_hash": "67d0bfb3408953d1ba6fb4ea6a499429",
+    "mtime": 1785761064.9923015,
+    "ast_hash": "7a1b667f26e14de2fae309e1c37bbf64",
     "semantic_hash": ""
   },
   "src/ui/mod.rs": {
