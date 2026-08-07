@@ -1,7 +1,7 @@
 # Graph Report - goose-mod-manager  (2026-08-08)
 
 ## Corpus Check
-- 25 files · ~30,532 words
+- 25 files · ~30,536 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9caa08a7`
+- Built from commit: `c2021ed9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

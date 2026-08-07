@@ -1,7 +1,7 @@
 # Graph Report - goose-mod-manager  (2026-08-08)
 
 ## Corpus Check
-- 25 files · ~30,539 words
+- 25 files · ~30,532 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary

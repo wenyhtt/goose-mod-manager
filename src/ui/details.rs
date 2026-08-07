@@ -108,19 +108,23 @@ fn paint_images(ui: &mut egui::Ui, app: &GooseModManager, mod_entry: &ModEntry, 
     let bottom = rect.bottom() - 92.0;
     let gap = 10.0;
     let count = preview_count(mod_entry);
-    let two_up = rect.width() >= 640.0 && count > 1;
-    let width = if two_up {
-        (rect.width() - gap) / 2.0
+    let peek_next = rect.width() >= 640.0 && count > 1;
+    let width = if peek_next {
+        rect.width() * 0.58
     } else {
         rect.width()
     };
     let left = Rect::from_min_size(Pos2::new(rect.left(), top), Vec2::new(width, bottom - top));
+
+    let old_clip = ui.clip_rect();
+    ui.set_clip_rect(old_clip.intersect(rect));
     paint_preview(ui, mod_entry, app.detail_image_offset, left);
 
-    if two_up {
+    if peek_next {
         let right = left.translate(Vec2::new(width + gap, 0.0));
         paint_preview(ui, mod_entry, app.detail_image_offset + 1, right);
     }
+    ui.set_clip_rect(old_clip);
 }
 
 fn paint_footer(ui: &mut egui::Ui, app: &mut GooseModManager, mod_entry: &ModEntry, rect: Rect) {
