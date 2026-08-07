@@ -1,7 +1,10 @@
-use eframe::egui::{self, CornerRadius, Stroke, StrokeKind, Vec2};
-use crate::theme::{CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_BTN_SIZE, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS, PILL_WIDTH, TAB_ACTIVE, TAB_INACTIVE, TEXT_WHITE, poppins};
-use crate::models::IconKind;
 use crate::icons::{paint_left_arrow, paint_right_arrow};
+use crate::models::IconKind;
+use crate::theme::{
+    CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_BTN_SIZE, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS,
+    PILL_WIDTH, TAB_ACTIVE, TAB_INACTIVE, TEXT_WHITE, poppins,
+};
+use eframe::egui::{self, CornerRadius, Stroke, StrokeKind, Vec2};
 
 pub fn pill_button(ui: &mut egui::Ui, id_source: &str, text: &str, active: bool) -> egui::Response {
     let desired = Vec2::new(PILL_WIDTH, PILL_HEIGHT);

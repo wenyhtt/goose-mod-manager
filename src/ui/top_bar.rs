@@ -2,8 +2,8 @@ use crate::app::GooseModManager;
 use crate::icons::paint_dropdown_arrow;
 use crate::models::{IconKind, SortOption, Tab};
 use crate::theme::{
-    BG_DARK, CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS, TEXT_WHITE, poppins,
-    poppins_sm,
+    BG_DARK, CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS, TEXT_WHITE,
+    poppins, poppins_sm,
 };
 use crate::ui::widgets::{icon_button, pill_button};
 use eframe::egui::{
@@ -38,7 +38,7 @@ pub fn render_top_bar(app: &mut GooseModManager, ui: &mut egui::Ui) {
                                     "BROWSE",
                                     app.active_tab == Tab::Browse,
                                 );
-                                
+
                                 if app.needs_initial_focus {
                                     browse_resp.request_focus();
                                     app.needs_initial_focus = false;
@@ -53,7 +53,9 @@ pub fn render_top_bar(app: &mut GooseModManager, ui: &mut egui::Ui) {
                                     "tab_installed",
                                     "INSTALLED",
                                     app.active_tab == Tab::Installed,
-                                ).clicked() {
+                                )
+                                .clicked()
+                                {
                                     app.active_tab = Tab::Installed;
                                     app.current_page = 0;
                                 }
@@ -64,7 +66,9 @@ pub fn render_top_bar(app: &mut GooseModManager, ui: &mut egui::Ui) {
                         // Arrow navigation
                         ui.horizontal(|ui| {
                             ui.spacing_mut().item_spacing.x = 10.0;
-                            if icon_button(ui, IconKind::LeftArrow).clicked() && app.current_page > 0 {
+                            if icon_button(ui, IconKind::LeftArrow).clicked()
+                                && app.current_page > 0
+                            {
                                 app.current_page -= 1;
                             }
                             if icon_button(ui, IconKind::RightArrow).clicked()
@@ -73,7 +77,6 @@ pub fn render_top_bar(app: &mut GooseModManager, ui: &mut egui::Ui) {
                                 app.current_page += 1;
                             }
                         });
-
                     });
                 });
             });
@@ -173,7 +176,7 @@ fn render_sort_controls(app: &mut GooseModManager, ui: &mut egui::Ui, top_right:
                 area_painter.rect_stroke(
                     menu_rect,
                     CornerRadius::same(12),
-                        Stroke::new(1.0, Color32::from_rgba_premultiplied(0xE1, 0xDC, 0xC9, 30)),
+                    Stroke::new(1.0, Color32::from_rgba_premultiplied(0xE1, 0xDC, 0xC9, 30)),
                     StrokeKind::Outside,
                 );
 

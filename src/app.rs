@@ -4,6 +4,22 @@ use crate::ui;
 use eframe::egui::{self, Frame, Margin, Vec2};
 use std::thread::JoinHandle;
 
+fn consume_detail_key(input: &mut egui::InputState, key: egui::Key) -> bool {
+    let initial_press = input.events.iter().any(|event| {
+        matches!(
+            event,
+            egui::Event::Key {
+                key: event_key,
+                pressed: true,
+                repeat: false,
+                ..
+            } if *event_key == key
+        )
+    });
+    input.consume_key(egui::Modifiers::NONE, key);
+    initial_press
+}
+
 pub struct GooseModManager {
     pub active_tab: Tab,
     pub current_page: usize,
@@ -59,8 +75,8 @@ impl GooseModManager {
     fn load_mods() -> Vec<ModEntry> {
         let cached_path = crate::scraper::cache_dir().join("mods.json");
         let legacy_path = format!("{}/mods.json", env!("CARGO_MANIFEST_DIR"));
-        if let Ok(data) = std::fs::read_to_string(cached_path)
-            .or_else(|_| std::fs::read_to_string(legacy_path))
+        if let Ok(data) =
+            std::fs::read_to_string(cached_path).or_else(|_| std::fs::read_to_string(legacy_path))
         {
             let mut parsed: Vec<ModEntry> = serde_json::from_str(&data).unwrap_or_default();
             for m in parsed.iter_mut() {
@@ -83,7 +99,9 @@ impl GooseModManager {
     }
 
     fn refresh_after_scrape(&mut self) {
-        let Some(task) = self.scrape_task.take() else { return };
+        let Some(task) = self.scrape_task.take() else {
+            return;
+        };
         if task.is_finished() {
             match task.join() {
                 Ok(Ok((page, mods))) => {
@@ -215,6 +233,83 @@ impl GooseModManager {
         self.detail_image_offset = 0;
     }
 
+    pub fn carousel_prev(&mut self) {
+        let count = self.selected_mod_preview_count();
+        self.detail_image_offset = previous_carousel_offset(self.detail_image_offset, count);
+    }
+
+    pub fn carousel_next(&mut self) {
+        let count = self.selected_mod_preview_count();
+        self.detail_image_offset = next_carousel_offset(self.detail_image_offset, count);
+    }
+
+    fn selected_mod_preview_count(&self) -> usize {
+        self.selected_mod()
+            .map(|mod_entry| {
+                if mod_entry.detail_image_bytes.is_empty() {
+                    usize::from(mod_entry.image_bytes.is_some())
+                } else {
+                    mod_entry.detail_image_bytes.len()
+                }
+            })
+            .unwrap_or(0)
+    }
+
+    fn details_focus_is(ctx: &egui::Context, id: &str) -> bool {
+        ctx.memory(|mem| mem.focused() == Some(egui::Id::new(id)))
+    }
+
+    fn details_focus(ctx: &egui::Context, id: &str) {
+        ctx.memory_mut(|mem| {
+            mem.request_focus(egui::Id::new(id));
+            mem.move_focus(egui::FocusDirection::None);
+        });
+    }
+
+    fn details_up(ctx: &egui::Context) {
+        Self::details_focus(ctx, ui::details::DETAIL_IMAGE_CURRENT_ID);
+    }
+
+    fn details_down(&self, ctx: &egui::Context) {
+        if Self::details_focus_is(ctx, ui::details::DETAIL_VIEW_WEB_ID)
+            && self.selected_mod_preview_count() > 1
+        {
+            Self::details_focus(ctx, ui::details::DETAIL_ARROW_LEFT_ID);
+        } else {
+            Self::details_focus(ctx, ui::details::DETAIL_VIEW_WEB_ID);
+        }
+    }
+
+    fn details_left(&mut self, ctx: &egui::Context) {
+        if Self::details_focus_is(ctx, ui::details::DETAIL_IMAGE_CURRENT_ID) {
+            self.carousel_prev();
+        } else if Self::details_focus_is(ctx, ui::details::DETAIL_ARROW_RIGHT_ID) {
+            Self::details_focus(ctx, ui::details::DETAIL_ARROW_LEFT_ID);
+        } else if Self::details_focus_is(ctx, ui::details::DETAIL_ARROW_LEFT_ID) {
+            Self::details_focus(ctx, ui::details::DETAIL_VIEW_WEB_ID);
+        } else {
+            Self::details_focus(ctx, ui::details::DETAIL_IMAGE_CURRENT_ID);
+        }
+    }
+
+    fn details_right(&mut self, ctx: &egui::Context) {
+        if Self::details_focus_is(ctx, ui::details::DETAIL_IMAGE_CURRENT_ID)
+            || Self::details_focus_is(ctx, ui::details::DETAIL_IMAGE_NEXT_ID)
+            || Self::details_focus_is(ctx, ui::details::DETAIL_ARROW_RIGHT_ID)
+        {
+            self.carousel_next();
+            Self::details_focus(ctx, ui::details::DETAIL_IMAGE_CURRENT_ID);
+        } else if Self::details_focus_is(ctx, ui::details::DETAIL_VIEW_WEB_ID)
+            && self.selected_mod_preview_count() > 1
+        {
+            Self::details_focus(ctx, ui::details::DETAIL_ARROW_LEFT_ID);
+        } else if Self::details_focus_is(ctx, ui::details::DETAIL_ARROW_LEFT_ID) {
+            Self::details_focus(ctx, ui::details::DETAIL_ARROW_RIGHT_ID);
+        } else {
+            Self::details_focus(ctx, ui::details::DETAIL_IMAGE_CURRENT_ID);
+        }
+    }
+
     pub fn selected_mod(&self) -> Option<&ModEntry> {
         let url = self.selected_mod_url.as_ref()?;
         self.mods.iter().find(|mod_entry| &mod_entry.url == url)
@@ -242,6 +337,22 @@ impl GooseModManager {
     }
 }
 
+fn previous_carousel_offset(offset: usize, count: usize) -> usize {
+    if count > 1 {
+        (offset + count - 1) % count
+    } else {
+        offset
+    }
+}
+
+fn next_carousel_offset(offset: usize, count: usize) -> usize {
+    if count > 1 {
+        (offset + 1) % count
+    } else {
+        offset
+    }
+}
+
 impl eframe::App for GooseModManager {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         self.refresh_after_scrape();
@@ -252,8 +363,13 @@ impl eframe::App for GooseModManager {
 
         // ── GAMEPAD INPUT HANDLING ─────────────────────────────────────────
         while let Some(gilrs::Event { event, .. }) = self.gilrs.next_event() {
+            let details_open = self.selected_mod_url.is_some();
             match event {
                 gilrs::EventType::ButtonPressed(gilrs::Button::DPadUp, _) => {
+                    if details_open {
+                        Self::details_up(&ctx);
+                        continue;
+                    }
                     if ctx.memory(|mem| mem.focused().is_none()) {
                         self.needs_initial_focus = true;
                     } else {
@@ -261,6 +377,10 @@ impl eframe::App for GooseModManager {
                     }
                 }
                 gilrs::EventType::ButtonPressed(gilrs::Button::DPadDown, _) => {
+                    if details_open {
+                        self.details_down(&ctx);
+                        continue;
+                    }
                     if ctx.memory(|mem| mem.focused().is_none()) {
                         self.needs_initial_focus = true;
                     } else {
@@ -268,6 +388,10 @@ impl eframe::App for GooseModManager {
                     }
                 }
                 gilrs::EventType::ButtonPressed(gilrs::Button::DPadLeft, _) => {
+                    if details_open {
+                        self.details_left(&ctx);
+                        continue;
+                    }
                     if ctx.memory(|mem| mem.focused().is_none()) {
                         self.needs_initial_focus = true;
                     } else {
@@ -275,6 +399,10 @@ impl eframe::App for GooseModManager {
                     }
                 }
                 gilrs::EventType::ButtonPressed(gilrs::Button::DPadRight, _) => {
+                    if details_open {
+                        self.details_right(&ctx);
+                        continue;
+                    }
                     if ctx.memory(|mem| mem.focused().is_none()) {
                         self.needs_initial_focus = true;
                     } else {
@@ -282,40 +410,48 @@ impl eframe::App for GooseModManager {
                     }
                 }
                 gilrs::EventType::ButtonPressed(gilrs::Button::South, _) => {
-                    ctx.input_mut(|i| i.events.push(egui::Event::Key {
-                        key: egui::Key::Enter,
-                        physical_key: None,
-                        pressed: true,
-                        repeat: false,
-                        modifiers: egui::Modifiers::NONE,
-                    }));
+                    ctx.input_mut(|i| {
+                        i.events.push(egui::Event::Key {
+                            key: egui::Key::Enter,
+                            physical_key: None,
+                            pressed: true,
+                            repeat: false,
+                            modifiers: egui::Modifiers::NONE,
+                        })
+                    });
                 }
                 gilrs::EventType::ButtonReleased(gilrs::Button::South, _) => {
-                    ctx.input_mut(|i| i.events.push(egui::Event::Key {
-                        key: egui::Key::Enter,
-                        physical_key: None,
-                        pressed: false,
-                        repeat: false,
-                        modifiers: egui::Modifiers::NONE,
-                    }));
+                    ctx.input_mut(|i| {
+                        i.events.push(egui::Event::Key {
+                            key: egui::Key::Enter,
+                            physical_key: None,
+                            pressed: false,
+                            repeat: false,
+                            modifiers: egui::Modifiers::NONE,
+                        })
+                    });
                 }
                 gilrs::EventType::ButtonPressed(gilrs::Button::East, _) => {
-                    ctx.input_mut(|i| i.events.push(egui::Event::Key {
-                        key: egui::Key::Escape,
-                        physical_key: None,
-                        pressed: true,
-                        repeat: false,
-                        modifiers: egui::Modifiers::NONE,
-                    }));
+                    ctx.input_mut(|i| {
+                        i.events.push(egui::Event::Key {
+                            key: egui::Key::Escape,
+                            physical_key: None,
+                            pressed: true,
+                            repeat: false,
+                            modifiers: egui::Modifiers::NONE,
+                        })
+                    });
                 }
                 gilrs::EventType::ButtonReleased(gilrs::Button::East, _) => {
-                    ctx.input_mut(|i| i.events.push(egui::Event::Key {
-                        key: egui::Key::Escape,
-                        physical_key: None,
-                        pressed: false,
-                        repeat: false,
-                        modifiers: egui::Modifiers::NONE,
-                    }));
+                    ctx.input_mut(|i| {
+                        i.events.push(egui::Event::Key {
+                            key: egui::Key::Escape,
+                            physical_key: None,
+                            pressed: false,
+                            repeat: false,
+                            modifiers: egui::Modifiers::NONE,
+                        })
+                    });
                 }
                 _ => {}
             }
@@ -345,7 +481,10 @@ impl eframe::App for GooseModManager {
                         || i.key_pressed(egui::Key::ArrowLeft)
                         || i.key_pressed(egui::Key::ArrowRight)
                 });
-                if arrow_pressed && ui.ctx().memory(|mem| mem.focused().is_none()) {
+                if !self.selected_mod_url.is_some()
+                    && arrow_pressed
+                    && ui.ctx().memory(|mem| mem.focused().is_none())
+                {
                     self.needs_initial_focus = true;
                 }
 
@@ -354,6 +493,20 @@ impl eframe::App for GooseModManager {
                     && ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape))
                 {
                     self.close_details();
+                }
+                if details_open {
+                    if ui.input_mut(|i| consume_detail_key(i, egui::Key::ArrowUp)) {
+                        Self::details_up(ui.ctx());
+                    }
+                    if ui.input_mut(|i| consume_detail_key(i, egui::Key::ArrowDown)) {
+                        self.details_down(ui.ctx());
+                    }
+                    if ui.input_mut(|i| consume_detail_key(i, egui::Key::ArrowLeft)) {
+                        self.details_left(ui.ctx());
+                    }
+                    if ui.input_mut(|i| consume_detail_key(i, egui::Key::ArrowRight)) {
+                        self.details_right(ui.ctx());
+                    }
                 }
 
                 // ── KEYBOARD / GAMEPAD ARROW NAVIGATION ───────────────────────────
@@ -427,5 +580,18 @@ impl eframe::App for GooseModManager {
 
                 ui::details::render_details(self, ui.ctx());
             });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{next_carousel_offset, previous_carousel_offset};
+
+    #[test]
+    fn carousel_offsets_wrap_and_ignore_single_image() {
+        assert_eq!(previous_carousel_offset(0, 3), 2);
+        assert_eq!(next_carousel_offset(2, 3), 0);
+        assert_eq!(previous_carousel_offset(0, 1), 0);
+        assert_eq!(next_carousel_offset(0, 0), 0);
     }
 }

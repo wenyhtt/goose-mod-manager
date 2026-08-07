@@ -5,8 +5,8 @@
     "semantic_hash": "7b1df4f0fcdee96e320ffa3d5c23e5d1"
   },
   "src/app.rs": {
-    "mtime": 1786125187.0363867,
-    "ast_hash": "f4ac3d34526dc71c5127be9c132cc8d7",
+    "mtime": 1786139072.747491,
+    "ast_hash": "8bdf3d69c32aa2a9197fbdf8365b246c",
     "semantic_hash": ""
   },
   "src/bin/scraper.rs": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "src/main.rs": {
-    "mtime": 1786124998.292337,
-    "ast_hash": "0b5d6561cc3483ac1e5e31877d353a9a",
+    "mtime": 1786136783.679158,
+    "ast_hash": "3e227b295d01e94d108b5646bc2c0ff7",
     "semantic_hash": ""
   },
   "src/models.rs": {
@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "src/ui/grid.rs": {
-    "mtime": 1786125039.693648,
-    "ast_hash": "d4ad0f11c6b5df8f59392eb1f30108cf",
+    "mtime": 1786136783.6991575,
+    "ast_hash": "3d36dde033af40400cf1f0ed147dbf6d",
     "semantic_hash": ""
   },
   "src/ui/mod.rs": {
@@ -50,13 +50,13 @@
     "semantic_hash": ""
   },
   "src/ui/top_bar.rs": {
-    "mtime": 1786125056.2391748,
-    "ast_hash": "9cc228497f96be9fdf23101e11881e3a",
+    "mtime": 1786136783.7101574,
+    "ast_hash": "22929ca53d3835c800897afb856e10b8",
     "semantic_hash": ""
   },
   "src/ui/widgets.rs": {
-    "mtime": 1786125056.4741824,
-    "ast_hash": "5c9e89248c5ac1d162ebd08edca605bc",
+    "mtime": 1786136783.7111573,
+    "ast_hash": "23bdecd26daf29d8efd922466cc26b00",
     "semantic_hash": ""
   },
   ".codex/skills/graphify/SKILL.md": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "src/ui/details.rs": {
-    "mtime": 1786126723.2860506,
-    "ast_hash": "5c84110ccc7f7eb31fec930bab74053a",
+    "mtime": 1786136783.6931577,
+    "ast_hash": "ca3703ebf34b61edc7fd5d5e413417f6",
     "semantic_hash": ""
   },
   "src/ui/images.rs": {

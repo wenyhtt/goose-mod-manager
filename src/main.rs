@@ -1,5 +1,5 @@
-use std::sync::Arc;
 use eframe::egui::{FontData, FontDefinitions, FontFamily};
+use std::sync::Arc;
 
 mod app;
 mod icons;

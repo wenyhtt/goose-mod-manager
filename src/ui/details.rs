@@ -2,11 +2,17 @@ use crate::app::GooseModManager;
 use crate::icons::{paint_download_icon, paint_heart_icon, paint_left_arrow, paint_right_arrow};
 use crate::models::ModEntry;
 use crate::theme::{
-    poppins, poppins_sm, poppins_xs, BG_DARK, CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_COLOR,
-    TEXT_WHITE,
+    BG_DARK, CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_COLOR, TEXT_WHITE, poppins, poppins_sm,
+    poppins_xs,
 };
 use crate::ui::images::{bytes_image, fallback_image, paint_cover_image};
 use eframe::egui::{self, Color32, CornerRadius, Id, Pos2, Rect, Sense, Stroke, StrokeKind, Vec2};
+
+pub const DETAIL_IMAGE_CURRENT_ID: &str = "detail_image_current";
+pub const DETAIL_IMAGE_NEXT_ID: &str = "detail_image_next";
+pub const DETAIL_VIEW_WEB_ID: &str = "detail_view_web";
+pub const DETAIL_ARROW_LEFT_ID: &str = "detail_arrow_left";
+pub const DETAIL_ARROW_RIGHT_ID: &str = "detail_arrow_right";
 
 pub fn render_details(app: &mut GooseModManager, ctx: &egui::Context) {
     let Some(mod_entry) = app.selected_mod().cloned() else {
@@ -103,7 +109,7 @@ fn paint_header(ui: &mut egui::Ui, mod_entry: &ModEntry, rect: Rect) {
     }
 }
 
-fn paint_images(ui: &mut egui::Ui, app: &GooseModManager, mod_entry: &ModEntry, rect: Rect) {
+fn paint_images(ui: &mut egui::Ui, app: &mut GooseModManager, mod_entry: &ModEntry, rect: Rect) {
     let top = rect.top() + 82.0;
     let bottom = rect.bottom() - 92.0;
     let gap = 10.0;
@@ -118,25 +124,40 @@ fn paint_images(ui: &mut egui::Ui, app: &GooseModManager, mod_entry: &ModEntry, 
 
     let old_clip = ui.clip_rect();
     ui.set_clip_rect(old_clip.intersect(rect));
+    let left_resp = ui.interact(left, Id::new(DETAIL_IMAGE_CURRENT_ID), Sense::click());
     paint_preview(ui, mod_entry, app.detail_image_offset, left);
 
     if peek_next {
         let right = left.translate(Vec2::new(width + gap, 0.0));
+        let visible = right.intersect(rect);
+        let right_resp = ui.interact(visible, Id::new(DETAIL_IMAGE_NEXT_ID), Sense::click());
         paint_preview(ui, mod_entry, app.detail_image_offset + 1, right);
+        if right_resp.has_focus() {
+            app.carousel_next();
+            left_resp.request_focus();
+            ui.ctx().request_repaint();
+        }
     }
     ui.set_clip_rect(old_clip);
+    focus(ui, left, left_resp.has_focus(), 10);
+
+    if app.details_just_opened || ui.ctx().memory(|mem| mem.focused().is_none()) {
+        left_resp.request_focus();
+    }
 }
 
 fn paint_footer(ui: &mut egui::Ui, app: &mut GooseModManager, mod_entry: &ModEntry, rect: Rect) {
     let y = rect.bottom() - 52.0;
     dialog_button(
         ui,
+        "detail_install",
         Rect::from_min_size(Pos2::new(rect.left(), y), Vec2::new(122.0, 46.0)),
         "INSTALL",
         false,
     );
     if dialog_button(
         ui,
+        DETAIL_VIEW_WEB_ID,
         Rect::from_min_size(Pos2::new(rect.left() + 134.0, y), Vec2::new(184.0, 46.0)),
         "VIEW ON WEB",
         true,
@@ -150,11 +171,11 @@ fn paint_footer(ui: &mut egui::Ui, app: &mut GooseModManager, mod_entry: &ModEnt
     if count > 1 {
         let right = Rect::from_min_size(Pos2::new(rect.right() - 52.0, y - 2.0), Vec2::splat(52.0));
         let left = right.translate(Vec2::new(-62.0, 0.0));
-        if arrow_button(ui, left, false).clicked() {
-            app.detail_image_offset = (app.detail_image_offset + count - 1) % count;
+        if arrow_button(ui, DETAIL_ARROW_LEFT_ID, left, false).clicked() {
+            app.carousel_prev();
         }
-        if arrow_button(ui, right, true).clicked() {
-            app.detail_image_offset = (app.detail_image_offset + 1) % count;
+        if arrow_button(ui, DETAIL_ARROW_RIGHT_ID, right, true).clicked() {
+            app.carousel_next();
         }
     }
 }
@@ -184,9 +205,16 @@ fn preview_count(mod_entry: &ModEntry) -> usize {
     }
 }
 
-fn dialog_button(ui: &mut egui::Ui, rect: Rect, label: &str, enabled: bool) -> egui::Response {
-    let response = ui.allocate_rect(
+fn dialog_button(
+    ui: &mut egui::Ui,
+    id: &str,
+    rect: Rect,
+    label: &str,
+    enabled: bool,
+) -> egui::Response {
+    let response = ui.interact(
         rect,
+        Id::new(id),
         if enabled {
             Sense::click()
         } else {
@@ -218,8 +246,11 @@ fn dialog_button(ui: &mut egui::Ui, rect: Rect, label: &str, enabled: bool) -> e
     response
 }
 
-fn arrow_button(ui: &mut egui::Ui, rect: Rect, right: bool) -> egui::Response {
-    let response = ui.allocate_rect(rect, Sense::click());
+fn arrow_button(ui: &mut egui::Ui, id: &str, rect: Rect, right: bool) -> egui::Response {
+    let response = ui.interact(rect, Id::new(id), Sense::click());
+    if response.clicked() {
+        response.request_focus();
+    }
     let bg = if response.hovered() {
         CARD_BG_HOVER
     } else {

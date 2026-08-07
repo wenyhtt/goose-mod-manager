@@ -2,8 +2,8 @@ use crate::app::GooseModManager;
 use crate::icons::paint_download_icon;
 use crate::models::ModEntry;
 use crate::theme::{
-    poppins_sm, poppins_xs, CARD_BG, CARD_BG_HOVER, CARD_RADIUS, FOCUS_COLOR, ICON_COLOR,
-    TEXT_WHITE,
+    CARD_BG, CARD_BG_HOVER, CARD_RADIUS, FOCUS_COLOR, ICON_COLOR, TEXT_WHITE, poppins_sm,
+    poppins_xs,
 };
 use crate::ui::images::{bytes_image, fallback_image, paint_cover_image};
 use eframe::egui::{self, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Vec2};
