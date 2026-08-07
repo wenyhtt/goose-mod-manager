@@ -5,8 +5,8 @@
     "semantic_hash": "7b1df4f0fcdee96e320ffa3d5c23e5d1"
   },
   "src/app.rs": {
-    "mtime": 1786125187.0363867,
-    "ast_hash": "f4ac3d34526dc71c5127be9c132cc8d7",
+    "mtime": 1785762472.7692554,
+    "ast_hash": "12e422489523eb92304024d54847cbb3",
     "semantic_hash": ""
   },
   "src/bin/scraper.rs": {
@@ -15,23 +15,23 @@
     "semantic_hash": "790f6eedc417ebab7acafc48eb4ec8ba"
   },
   "src/icons.rs": {
-    "mtime": 1786124847.345651,
-    "ast_hash": "b2dc3122ed79f30bafc500e3c4426f51",
-    "semantic_hash": ""
+    "mtime": 1785574347.5038135,
+    "ast_hash": "3a788034a0a171244a8d2c870b49d8d1",
+    "semantic_hash": "3a788034a0a171244a8d2c870b49d8d1"
   },
   "src/main.rs": {
-    "mtime": 1786124998.292337,
+    "mtime": 1785674025.9419792,
     "ast_hash": "0b5d6561cc3483ac1e5e31877d353a9a",
     "semantic_hash": ""
   },
   "src/models.rs": {
-    "mtime": 1786124936.423397,
-    "ast_hash": "0b2c899f459372e2cb7e8b60dfa0d696",
+    "mtime": 1785673577.155405,
+    "ast_hash": "69ae1a6ded1361d4a89abe855c8082c1",
     "semantic_hash": ""
   },
   "src/scraper.rs": {
-    "mtime": 1786124936.4323974,
-    "ast_hash": "f8cebeb8bb0b93c6c405ca570f08032e",
+    "mtime": 1785761777.8704622,
+    "ast_hash": "d12b672ae732bb9b3e514e7e40f01d18",
     "semantic_hash": ""
   },
   "src/theme.rs": {
@@ -40,24 +40,24 @@
     "semantic_hash": ""
   },
   "src/ui/grid.rs": {
-    "mtime": 1786125039.693648,
-    "ast_hash": "d4ad0f11c6b5df8f59392eb1f30108cf",
+    "mtime": 1785762473.016242,
+    "ast_hash": "31e93b0eba5744ffb24e9b263e745b6c",
     "semantic_hash": ""
   },
   "src/ui/mod.rs": {
-    "mtime": 1786124805.3763785,
-    "ast_hash": "f38f925b70b52dbdd5ac47ccb4ad0843",
+    "mtime": 1785761336.0567777,
+    "ast_hash": "3f0bb62bea9153c2ed5504d237774d91",
     "semantic_hash": ""
   },
   "src/ui/top_bar.rs": {
-    "mtime": 1786125056.2391748,
-    "ast_hash": "9cc228497f96be9fdf23101e11881e3a",
+    "mtime": 1785761336.6837997,
+    "ast_hash": "efabd546b8fe4bfde57e27d56a8e38db",
     "semantic_hash": ""
   },
   "src/ui/widgets.rs": {
-    "mtime": 1786125056.4741824,
+    "mtime": 1785584617.494428,
     "ast_hash": "5c9e89248c5ac1d162ebd08edca605bc",
-    "semantic_hash": ""
+    "semantic_hash": "5c9e89248c5ac1d162ebd08edca605bc"
   },
   ".codex/skills/graphify/SKILL.md": {
     "mtime": 1785646908.1384048,
@@ -144,19 +144,9 @@
     "ast_hash": "95d961bd609c494018072f6c040ae3a1",
     "semantic_hash": ""
   },
-  "src/ui/details.rs": {
-    "mtime": 1786126383.6209302,
-    "ast_hash": "5b3a7fdf564683d3a143ffb7aaae7c44",
-    "semantic_hash": ""
-  },
-  "src/ui/images.rs": {
-    "mtime": 1786124936.4733987,
-    "ast_hash": "462882d7309b23e0e9024182eb0bb558",
-    "semantic_hash": ""
-  },
-  "assets/design/Mod Details Dialog Window.png": {
-    "mtime": 1786121727.5598648,
-    "ast_hash": "85e101d317d3e3bf4d91bc6e1fc15fd9",
+  "src/ui/installed.rs": {
+    "mtime": 1785762473.2412295,
+    "ast_hash": "282911aa0f5e5daab2f98ec118fdc254",
     "semantic_hash": ""
   }
 }

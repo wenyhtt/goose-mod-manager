@@ -1,12 +1,12 @@
-# Graph Report - goose-mod-manager  (2026-08-08)
+# Graph Report - goose-mod-manager  (2026-08-03)
 
 ## Corpus Check
-- 25 files · ~30,532 words
+- 24 files · ~16,173 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 208 nodes · 353 edges · 19 communities (15 shown, 4 thin omitted)
-- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.8)
+- 175 nodes · 264 edges · 19 communities (15 shown, 4 thin omitted)
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 13 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
@@ -17,11 +17,11 @@
 ## Community Hubs (Navigation)
 - src/scraper.rs
 - GooseModManager
-- theme.rs
+- models.rs
 - What You Must Do When Invoked
-- ModEntry
 - AI Agent Instructions for Goose Mod Manager
 - graphify reference: extra exports and benchmark
+- icons.rs
 - paint_card
 - graphify reference: query, path, explain
 - 🏗️ Architecture & Codebase Overview
@@ -34,28 +34,28 @@
 - extraction-spec.md
 
 ## God Nodes (most connected - your core abstractions)
-1. `GooseModManager` - 35 edges
-2. `ModEntry` - 22 edges
-3. `paint_card()` - 12 edges
-4. `What You Must Do When Invoked` - 12 edges
-5. `run_page()` - 10 edges
-6. `/graphify` - 10 edges
-7. `paint_footer()` - 9 edges
-8. `paint_header()` - 8 edges
-9. `paint_images()` - 8 edges
-10. `paint_preview()` - 8 edges
+1. `GooseModManager` - 32 edges
+2. `ModEntry` - 17 edges
+3. `What You Must Do When Invoked` - 12 edges
+4. `run_page()` - 10 edges
+5. `/graphify` - 10 edges
+6. `paint_card()` - 9 edges
+7. `render_sort_controls()` - 8 edges
+8. `graphify reference: extra exports and benchmark` - 8 edges
+9. `AI Agent Instructions for Goose Mod Manager` - 8 edges
+10. `load_cached_mods()` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `arrow_button()` --calls--> `paint_left_arrow()`  [INFERRED]
-  src/ui/details.rs → src/icons.rs
-- `arrow_button()` --calls--> `paint_right_arrow()`  [INFERRED]
-  src/ui/details.rs → src/icons.rs
+- `GooseModManager` --references--> `Tab`  [EXTRACTED]
+  src/app.rs → src/models.rs
+- `icon_button()` --calls--> `paint_left_arrow()`  [INFERRED]
+  src/ui/widgets.rs → src/icons.rs
+- `icon_button()` --calls--> `paint_right_arrow()`  [INFERRED]
+  src/ui/widgets.rs → src/icons.rs
+- `render_sort_controls()` --calls--> `paint_dropdown_arrow()`  [INFERRED]
+  src/ui/top_bar.rs → src/icons.rs
 - `paint_card()` --calls--> `paint_download_icon()`  [INFERRED]
   src/ui/grid.rs → src/icons.rs
-- `paint_header()` --calls--> `poppins()`  [INFERRED]
-  src/ui/details.rs → src/theme.rs
-- `dialog_button()` --calls--> `poppins_sm()`  [INFERRED]
-  src/ui/details.rs → src/theme.rs
 
 ## Import Cycles
 - None detected.
@@ -63,24 +63,20 @@
 ## Communities (19 total, 4 thin omitted)
 
 ### Community 0 - "src/scraper.rs"
-Cohesion: 0.16
-Nodes (27): Box, ElementRef, Error, HashMap, Html, PathBuf, Selector, absolute_url() (+19 more)
+Cohesion: 0.20
+Nodes (20): Box, ElementRef, Error, HashMap, PathBuf, Selector, cache_dir(), config_dir() (+12 more)
 
 ### Community 1 - "GooseModManager"
-Cohesion: 0.10
-Nodes (14): App, Default, Frame, Gilrs, JoinHandle, GooseModManager, Option, Result (+6 more)
+Cohesion: 0.12
+Nodes (17): App, Bytes, Default, Frame, Gilrs, JoinHandle, GooseModManager, Option (+9 more)
 
-### Community 2 - "theme.rs"
-Cohesion: 0.17
-Nodes (21): FontId, paint_download_icon(), paint_dropdown_arrow(), paint_heart_icon(), paint_left_arrow(), paint_right_arrow(), Color32, Painter (+13 more)
+### Community 2 - "models.rs"
+Cohesion: 0.18
+Nodes (11): Response, IconKind, SortOption, Tab, render_sort_controls(), render_top_bar(), Pos2, Ui (+3 more)
 
 ### Community 3 - "What You Must Do When Invoked"
 Cohesion: 0.08
 Nodes (24): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, Part A - Structural extraction for code files (+16 more)
-
-### Community 4 - "ModEntry"
-Cohesion: 0.17
-Nodes (23): Context, ModEntry, Bytes, Option, Self, String, Vec, arrow_button() (+15 more)
 
 ### Community 5 - "AI Agent Instructions for Goose Mod Manager"
 Cohesion: 0.22
@@ -90,9 +86,13 @@ Nodes (8): 1. Architecture & State Management, 2. Layout & Responsiveness, 3. As
 Cohesion: 0.22
 Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7a - FalkorDB export (only if --falkordb or --falkordb-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
 
+### Community 7 - "icons.rs"
+Cohesion: 0.57
+Nodes (7): Color32, paint_download_icon(), paint_dropdown_arrow(), paint_left_arrow(), paint_right_arrow(), Painter, Pos2
+
 ### Community 8 - "paint_card"
-Cohesion: 0.22
-Nodes (14): CornerRadius, Image, paint_card(), paint_skeleton(), render_grid(), Painter, Rect, Ui (+6 more)
+Cohesion: 0.21
+Nodes (14): FontId, Instant, Rect, poppins(), poppins_sm(), poppins_xs(), paint_card(), paint_skeleton() (+6 more)
 
 ### Community 9 - "graphify reference: query, path, explain"
 Cohesion: 0.33
@@ -122,17 +122,15 @@ Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphif
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `GooseModManager` connect `GooseModManager` to `src/scraper.rs`, `paint_card`, `theme.rs`, `ModEntry`?**
-  _High betweenness centrality (0.156) - this node is a cross-community bridge._
-- **Why does `ModEntry` connect `ModEntry` to `src/scraper.rs`, `GooseModManager`, `paint_card`?**
-  _High betweenness centrality (0.149) - this node is a cross-community bridge._
-- **Why does `paint_card()` connect `paint_card` to `theme.rs`, `ModEntry`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
-- **Are the 6 inferred relationships involving `paint_card()` (e.g. with `paint_download_icon()` and `poppins_sm()`) actually correct?**
-  _`paint_card()` has 6 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `GooseModManager` connect `GooseModManager` to `paint_card`, `models.rs`?**
+  _High betweenness centrality (0.147) - this node is a cross-community bridge._
+- **Why does `ModEntry` connect `GooseModManager` to `src/scraper.rs`, `paint_card`, `models.rs`?**
+  _High betweenness centrality (0.135) - this node is a cross-community bridge._
+- **Why does `paint_card()` connect `paint_card` to `GooseModManager`, `icons.rs`?**
+  _High betweenness centrality (0.042) - this node is a cross-community bridge._
 - **What connects `Usage`, `What graphify is for`, `Step 0 - GitHub repos and multi-path merge (only if a URL or several paths)` to the rest of the system?**
   _51 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `GooseModManager` be split into smaller, more focused modules?**
-  _Cohesion score 0.0989247311827957 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11724137931034483 - nodes in this community are weakly interconnected._
 - **Should `What You Must Do When Invoked` be split into smaller, more focused modules?**
   _Cohesion score 0.08 - nodes in this community are weakly interconnected._

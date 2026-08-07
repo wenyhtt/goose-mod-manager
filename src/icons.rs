@@ -82,3 +82,18 @@ pub fn paint_download_icon(painter: &egui::Painter, center: Pos2, size: f32, col
         stroke,
     );
 }
+
+pub fn paint_heart_icon(painter: &egui::Painter, center: Pos2, size: f32, color: Color32) {
+    let s = size / 2.0;
+    let stroke = Stroke::new(2.0, color);
+    let points = vec![
+        Pos2::new(center.x, center.y + s * 0.55),
+        Pos2::new(center.x - s * 0.75, center.y - s * 0.1),
+        Pos2::new(center.x - s * 0.45, center.y - s * 0.65),
+        Pos2::new(center.x, center.y - s * 0.35),
+        Pos2::new(center.x + s * 0.45, center.y - s * 0.65),
+        Pos2::new(center.x + s * 0.75, center.y - s * 0.1),
+        Pos2::new(center.x, center.y + s * 0.55),
+    ];
+    painter.add(egui::Shape::line(points, stroke));
+}

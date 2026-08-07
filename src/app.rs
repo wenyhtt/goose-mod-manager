@@ -14,7 +14,12 @@ pub struct GooseModManager {
     pub rows: usize,
     pub needs_initial_focus: bool,
     pub gilrs: gilrs::Gilrs,
+    pub selected_mod_url: Option<String>,
+    pub detail_image_offset: usize,
+    pub details_just_opened: bool,
     scrape_task: Option<JoinHandle<Result<(usize, Vec<ModEntry>), String>>>,
+    detail_task: Option<JoinHandle<(String, Result<crate::scraper::ModDetails, String>)>>,
+    failed_detail_url: Option<String>,
     next_scrape_page: usize,
     has_more_scrape_pages: bool,
 }
@@ -38,7 +43,12 @@ impl Default for GooseModManager {
             rows: 2,
             needs_initial_focus: true,
             gilrs: gilrs::Gilrs::new().unwrap(),
+            selected_mod_url: None,
+            detail_image_offset: 0,
+            details_just_opened: false,
             scrape_task,
+            detail_task: None,
+            failed_detail_url: None,
             next_scrape_page: 2,
             has_more_scrape_pages: true,
         }
@@ -59,6 +69,12 @@ impl GooseModManager {
                         m.image_bytes = Some(egui::load::Bytes::Shared(bytes.into()));
                     }
                 }
+                m.detail_image_bytes = m
+                    .detail_image_paths
+                    .iter()
+                    .filter_map(|path| std::fs::read(path).ok())
+                    .map(|bytes| egui::load::Bytes::Shared(bytes.into()))
+                    .collect();
             }
             parsed
         } else {
@@ -123,6 +139,87 @@ impl GooseModManager {
         }));
     }
 
+    fn refresh_detail_fetch(&mut self) {
+        let Some(task) = self.detail_task.take() else {
+            return;
+        };
+        if !task.is_finished() {
+            self.detail_task = Some(task);
+            return;
+        }
+
+        match task.join() {
+            Ok((url, Ok(details))) => {
+                if let Some(mod_entry) = self.mods.iter_mut().find(|mod_entry| mod_entry.url == url)
+                {
+                    if !details.likes.is_empty() {
+                        mod_entry.likes = details.likes;
+                    }
+                    if !details.downloads.is_empty() {
+                        mod_entry.downloads = details.downloads;
+                    }
+                    if !details.image_paths.is_empty() {
+                        mod_entry.detail_image_paths = details.image_paths;
+                    }
+                    mod_entry.detail_image_bytes = mod_entry
+                        .detail_image_paths
+                        .iter()
+                        .filter_map(|path| std::fs::read(path).ok())
+                        .map(|bytes| egui::load::Bytes::Shared(bytes.into()))
+                        .collect();
+                }
+                if let Err(error) = crate::scraper::save_mods(&self.mods) {
+                    eprintln!("Saving mod details failed: {error}");
+                }
+            }
+            Ok((url, Err(error))) => {
+                self.failed_detail_url = Some(url);
+                eprintln!("Fetching mod details failed: {error}");
+            }
+            Err(_) => eprintln!("Detail fetch thread panicked"),
+        }
+    }
+
+    fn fetch_selected_details_if_needed(&mut self) {
+        let Some(url) = self.selected_mod_url.clone() else {
+            return;
+        };
+        if self.detail_task.is_some() || self.failed_detail_url.as_ref() == Some(&url) {
+            return;
+        }
+        let needs_details = self
+            .mods
+            .iter()
+            .find(|mod_entry| mod_entry.url == url)
+            .is_some_and(|mod_entry| {
+                mod_entry.likes.is_empty() || mod_entry.detail_image_paths.is_empty()
+            });
+        if needs_details {
+            self.detail_task = Some(std::thread::spawn(move || {
+                let result = crate::scraper::run_details(&url).map_err(|error| error.to_string());
+                (url, result)
+            }));
+        }
+    }
+
+    pub fn open_details(&mut self, index: usize) {
+        if let Some(mod_entry) = self.mods.get(index) {
+            self.selected_mod_url = Some(mod_entry.url.clone());
+            self.detail_image_offset = 0;
+            self.details_just_opened = true;
+        }
+    }
+
+    pub fn close_details(&mut self) {
+        self.selected_mod_url = None;
+        self.detail_image_offset = 0;
+    }
+
+    pub fn selected_mod(&self) -> Option<&ModEntry> {
+        let url = self.selected_mod_url.as_ref()?;
+        self.mods.iter().find(|mod_entry| &mod_entry.url == url)
+    }
+
     pub fn total_pages(&self) -> usize {
         let items_per_page = (self.cols * self.rows).max(1);
         let loaded_pages = (self.mods.len() + items_per_page - 1) / items_per_page;
@@ -149,8 +246,10 @@ impl eframe::App for GooseModManager {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         self.refresh_after_scrape();
         self.refresh_scrape_if_needed();
+        self.refresh_detail_fetch();
+        self.fetch_selected_details_if_needed();
         let ctx = ui.ctx().clone();
-        
+
         // ── GAMEPAD INPUT HANDLING ─────────────────────────────────────────
         while let Some(gilrs::Event { event, .. }) = self.gilrs.next_event() {
             match event {
@@ -221,7 +320,7 @@ impl eframe::App for GooseModManager {
                 _ => {}
             }
         }
-        
+
         ctx.request_repaint(); // Keep polling inputs
 
         // Apply dark style
@@ -250,25 +349,41 @@ impl eframe::App for GooseModManager {
                     self.needs_initial_focus = true;
                 }
 
+                let details_open = self.selected_mod_url.is_some();
+                if details_open
+                    && ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape))
+                {
+                    self.close_details();
+                }
+
                 // ── KEYBOARD / GAMEPAD ARROW NAVIGATION ───────────────────────────
-                if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowUp)) {
-                    if ui.ctx().memory(|mem| mem.focused().is_some()) {
-                        ui.ctx().memory_mut(|mem| mem.move_focus(egui::FocusDirection::Up));
+                if !details_open {
+                    if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowUp)) {
+                        if ui.ctx().memory(|mem| mem.focused().is_some()) {
+                            ui.ctx()
+                                .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Up));
+                        }
                     }
-                }
-                if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowDown)) {
-                    if ui.ctx().memory(|mem| mem.focused().is_some()) {
-                        ui.ctx().memory_mut(|mem| mem.move_focus(egui::FocusDirection::Down));
+                    if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowDown))
+                    {
+                        if ui.ctx().memory(|mem| mem.focused().is_some()) {
+                            ui.ctx()
+                                .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Down));
+                        }
                     }
-                }
-                if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowLeft)) {
-                    if ui.ctx().memory(|mem| mem.focused().is_some()) {
-                        ui.ctx().memory_mut(|mem| mem.move_focus(egui::FocusDirection::Left));
+                    if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowLeft))
+                    {
+                        if ui.ctx().memory(|mem| mem.focused().is_some()) {
+                            ui.ctx()
+                                .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Left));
+                        }
                     }
-                }
-                if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowRight)) {
-                    if ui.ctx().memory(|mem| mem.focused().is_some()) {
-                        ui.ctx().memory_mut(|mem| mem.move_focus(egui::FocusDirection::Right));
+                    if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowRight))
+                    {
+                        if ui.ctx().memory(|mem| mem.focused().is_some()) {
+                            ui.ctx()
+                                .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Right));
+                        }
                     }
                 }
                 ui.spacing_mut().item_spacing = Vec2::new(10.0, 10.0);
@@ -287,26 +402,30 @@ impl eframe::App for GooseModManager {
                 self.rows = ((content_h + gap) / (min_h + gap)).floor().max(1.0) as usize;
                 self.current_page = self.current_page.min(self.total_pages().saturating_sub(1));
 
-                // ── TOP BAR ──────────────────────────────────────────
-                ui::top_bar::render_top_bar(self, ui);
+                ui.add_enabled_ui(!details_open, |ui| {
+                    // ── TOP BAR ──────────────────────────────────────────
+                    ui::top_bar::render_top_bar(self, ui);
 
-                ui.add_space(4.0);
+                    ui.add_space(4.0);
 
-                // ── GRID OR EMPTY STATE ─────────────────────────────────────────────
-                if self.sort_by == SortOption::Vehicle {
-                    ui::grid::render_grid(self, ui);
-                } else {
-                    ui.centered_and_justified(|ui| {
-                        ui.label(
-                            egui::RichText::new("Oops.. we ain't ready yet")
-                                .font(egui::FontId::new(
-                                    36.0,
-                                    egui::FontFamily::Name("Poppins".into()),
-                                ))
-                                .color(TEXT_WHITE),
-                        );
-                    });
-                }
+                    // ── GRID OR EMPTY STATE ─────────────────────────────────────────────
+                    if self.sort_by == SortOption::Vehicle {
+                        ui::grid::render_grid(self, ui);
+                    } else {
+                        ui.centered_and_justified(|ui| {
+                            ui.label(
+                                egui::RichText::new("Oops.. we ain't ready yet")
+                                    .font(egui::FontId::new(
+                                        36.0,
+                                        egui::FontFamily::Name("Poppins".into()),
+                                    ))
+                                    .color(TEXT_WHITE),
+                            );
+                        });
+                    }
+                });
+
+                ui::details::render_details(self, ui.ctx());
             });
     }
 }

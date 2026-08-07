@@ -7,6 +7,12 @@ use std::time::Duration;
 
 use crate::models::ModEntry;
 
+pub struct ModDetails {
+    pub likes: String,
+    pub downloads: String,
+    pub image_paths: Vec<String>,
+}
+
 fn project_root() -> PathBuf {
     let manifest = std::env::var("CARGO_MANIFEST_DIR")
         .unwrap_or_else(|_| env!("CARGO_MANIFEST_DIR").to_string());
@@ -26,8 +32,7 @@ pub fn cache_dir() -> PathBuf {
             .or_else(|| home().map(|path| PathBuf::from(path).join(".cache").into_os_string()))
             .map(PathBuf::from)
     };
-    base.unwrap_or_else(project_root)
-        .join("goose-mod-manager")
+    base.unwrap_or_else(project_root).join("goose-mod-manager")
 }
 
 fn load_cached_mods() -> HashMap<String, ModEntry> {
@@ -137,7 +142,11 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
             } else {
                 let file_name = img_src.split('/').last().unwrap_or("thumb.jpg");
                 let abs_path = thumb_dir.join(file_name);
-                if !abs_path.exists() || fs::metadata(&abs_path).map(|m| m.len() == 0).unwrap_or(true) {
+                if !abs_path.exists()
+                    || fs::metadata(&abs_path)
+                        .map(|m| m.len() == 0)
+                        .unwrap_or(true)
+                {
                     println!("Downloading thumbnail: {}", img_src);
                     if let Ok(bytes) = client
                         .get(&img_src)
@@ -174,15 +183,105 @@ pub fn run_page(page: usize) -> Result<Vec<ModEntry>, Box<dyn std::error::Error>
     Ok(mods)
 }
 
+pub fn run_details(url: &str) -> Result<ModDetails, Box<dyn std::error::Error>> {
+    let client = reqwest::blocking::Client::builder()
+        .timeout(Duration::from_secs(10))
+        .build()?;
+    let html = client.get(url).send()?.error_for_status()?.text()?;
+    let document = Html::parse_document(&html);
+    let detail = extract_details(&document);
+    let slug = url
+        .trim_end_matches('/')
+        .rsplit('/')
+        .next()
+        .unwrap_or("mod")
+        .chars()
+        .filter(|c| c.is_ascii_alphanumeric() || *c == '-' || *c == '_')
+        .collect::<String>();
+    let image_dir = cache_dir().join("detail-images");
+    fs::create_dir_all(&image_dir)?;
+    let mut image_paths = Vec::new();
+
+    for image_url in detail.image_urls {
+        let file_name = image_url
+            .split('?')
+            .next()
+            .unwrap_or(&image_url)
+            .rsplit('/')
+            .next()
+            .unwrap_or("detail.jpg");
+        let path = image_dir.join(format!("{slug}-{file_name}"));
+        if !path.exists() || fs::metadata(&path).map(|m| m.len() == 0).unwrap_or(true) {
+            if let Ok(bytes) = client
+                .get(&image_url)
+                .send()
+                .and_then(|response| response.error_for_status())
+                .and_then(|response| response.bytes())
+            {
+                if !bytes.is_empty() {
+                    fs::write(&path, &bytes)?;
+                }
+            }
+        }
+        if path.exists() {
+            image_paths.push(path.to_string_lossy().to_string());
+        }
+    }
+
+    Ok(ModDetails {
+        likes: detail.likes,
+        downloads: detail.downloads,
+        image_paths,
+    })
+}
+
+struct ExtractedDetails {
+    likes: String,
+    downloads: String,
+    image_urls: Vec<String>,
+}
+
+fn extract_details(document: &Html) -> ExtractedDetails {
+    let image_selector = Selector::parse("a.thumbnail.mfp-image[href]").unwrap();
+    let likes_selector = Selector::parse(".num-likes").unwrap();
+    let downloads_selector =
+        Selector::parse(".file-downloads .num-downloads, .num-downloads").unwrap();
+
+    ExtractedDetails {
+        likes: document
+            .select(&likes_selector)
+            .map(element_text)
+            .find(|text| is_count(text))
+            .unwrap_or_default(),
+        downloads: document
+            .select(&downloads_selector)
+            .map(element_text)
+            .filter_map(|text| first_count(&text))
+            .next()
+            .unwrap_or_default(),
+        image_urls: document
+            .select(&image_selector)
+            .filter_map(|a| a.value().attr("href"))
+            .map(absolute_url)
+            .collect(),
+    }
+}
+
+fn absolute_url(url: &str) -> String {
+    if url.starts_with("http") {
+        url.to_string()
+    } else if url.starts_with("//") {
+        format!("https:{url}")
+    } else {
+        format!("https://www.gta5-mods.com{url}")
+    }
+}
+
 fn element_text(element: ElementRef<'_>) -> String {
     element.text().collect::<String>().trim().to_string()
 }
 
-fn extract_downloads(
-    element: ElementRef<'_>,
-    title: &str,
-    selector: &Selector,
-) -> String {
+fn extract_downloads(element: ElementRef<'_>, title: &str, selector: &Selector) -> String {
     if let Some(downloads) = element
         .select(selector)
         .map(element_text)
@@ -207,12 +306,21 @@ fn extract_downloads(
 }
 
 fn is_count(value: &str) -> bool {
-    let value = value.trim_matches(|character: char| !character.is_ascii_digit() && character != ',');
+    let value =
+        value.trim_matches(|character: char| !character.is_ascii_digit() && character != ',');
     !value.is_empty()
         && value.chars().any(|character| character.is_ascii_digit())
         && value
             .chars()
             .all(|character| character.is_ascii_digit() || character == ',')
+}
+
+fn first_count(value: &str) -> Option<String> {
+    value
+        .split_whitespace()
+        .map(|token| token.trim_matches(|c: char| !c.is_ascii_digit() && c != ','))
+        .find(|token| is_count(token))
+        .map(str::to_string)
 }
 
 pub fn save_mods(mods: &[ModEntry]) -> Result<(), Box<dyn std::error::Error>> {
@@ -222,7 +330,11 @@ pub fn save_mods(mods: &[ModEntry]) -> Result<(), Box<dyn std::error::Error>> {
     let json_data = serde_json::to_string_pretty(&mods)?;
     let mut file = fs::File::create(&json_path)?;
     file.write_all(json_data.as_bytes())?;
-    println!("Scraping complete. Saved {} mods to {}", mods.len(), json_path.display());
+    println!(
+        "Scraping complete. Saved {} mods to {}",
+        mods.len(),
+        json_path.display()
+    );
     Ok(())
 }
 
@@ -250,11 +362,39 @@ mod tests {
             item.select(&version_selector).next().map(element_text),
             Some("V2.1".to_string())
         );
-        let downloads_selector = Selector::parse("[class*='download'], [class*='Download']").unwrap();
+        let downloads_selector =
+            Selector::parse("[class*='download'], [class*='Download']").unwrap();
         assert_eq!(
             item.select(&downloads_selector).next().map(element_text),
             Some("226".to_string())
         );
-        assert_eq!(extract_downloads(item, "Test Mod", &downloads_selector), "226");
+        assert_eq!(
+            extract_downloads(item, "Test Mod", &downloads_selector),
+            "226"
+        );
+    }
+
+    #[test]
+    fn extracts_detail_images_and_likes() {
+        let document = Html::parse_fragment(
+            r#"
+            <a class="thumbnail mfp-image" href="https://img.gta5-mods.com/q95/images/mod/one.png"></a>
+            <a class="thumbnail mfp-image" href="//img.gta5-mods.com/q95/images/mod/two.png"></a>
+            <div class="file-downloads"><span class="num-downloads">3,864</span></div>
+            <span class="num-likes">53</span>
+            "#,
+        );
+
+        let details = extract_details(&document);
+
+        assert_eq!(details.likes, "53");
+        assert_eq!(details.downloads, "3,864");
+        assert_eq!(
+            details.image_urls,
+            vec![
+                "https://img.gta5-mods.com/q95/images/mod/one.png",
+                "https://img.gta5-mods.com/q95/images/mod/two.png"
+            ]
+        );
     }
 }
