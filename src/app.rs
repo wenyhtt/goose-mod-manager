@@ -4,21 +4,7 @@ use crate::ui;
 use eframe::egui::{self, Frame, Margin, Vec2};
 use std::thread::JoinHandle;
 
-fn consume_detail_key(input: &mut egui::InputState, key: egui::Key) -> bool {
-    let initial_press = input.events.iter().any(|event| {
-        matches!(
-            event,
-            egui::Event::Key {
-                key: event_key,
-                pressed: true,
-                repeat: false,
-                ..
-            } if *event_key == key
-        )
-    });
-    input.consume_key(egui::Modifiers::NONE, key);
-    initial_press
-}
+// Input module imported in main.rs
 
 pub struct GooseModManager {
     pub active_tab: Tab,
@@ -266,11 +252,11 @@ impl GooseModManager {
         });
     }
 
-    fn details_up(ctx: &egui::Context) {
+    pub(crate) fn details_up(ctx: &egui::Context) {
         Self::details_focus(ctx, ui::details::DETAIL_IMAGE_CURRENT_ID);
     }
 
-    fn details_down(&self, ctx: &egui::Context) {
+    pub(crate) fn details_down(&self, ctx: &egui::Context) {
         if Self::details_focus_is(ctx, ui::details::DETAIL_VIEW_WEB_ID)
             && self.selected_mod_preview_count() > 1
         {
@@ -280,7 +266,7 @@ impl GooseModManager {
         }
     }
 
-    fn details_left(&mut self, ctx: &egui::Context) {
+    pub(crate) fn details_left(&mut self, ctx: &egui::Context) {
         if Self::details_focus_is(ctx, ui::details::DETAIL_IMAGE_CURRENT_ID) {
             self.carousel_prev();
         } else if Self::details_focus_is(ctx, ui::details::DETAIL_ARROW_RIGHT_ID) {
@@ -292,7 +278,7 @@ impl GooseModManager {
         }
     }
 
-    fn details_right(&mut self, ctx: &egui::Context) {
+    pub(crate) fn details_right(&mut self, ctx: &egui::Context) {
         if Self::details_focus_is(ctx, ui::details::DETAIL_IMAGE_CURRENT_ID)
             || Self::details_focus_is(ctx, ui::details::DETAIL_IMAGE_NEXT_ID)
             || Self::details_focus_is(ctx, ui::details::DETAIL_ARROW_RIGHT_ID)
@@ -362,100 +348,7 @@ impl eframe::App for GooseModManager {
         let ctx = ui.ctx().clone();
 
         // ── GAMEPAD INPUT HANDLING ─────────────────────────────────────────
-        while let Some(gilrs::Event { event, .. }) = self.gilrs.next_event() {
-            let details_open = self.selected_mod_url.is_some();
-            match event {
-                gilrs::EventType::ButtonPressed(gilrs::Button::DPadUp, _) => {
-                    if details_open {
-                        Self::details_up(&ctx);
-                        continue;
-                    }
-                    if ctx.memory(|mem| mem.focused().is_none()) {
-                        self.needs_initial_focus = true;
-                    } else {
-                        ctx.memory_mut(|mem| mem.move_focus(egui::FocusDirection::Up));
-                    }
-                }
-                gilrs::EventType::ButtonPressed(gilrs::Button::DPadDown, _) => {
-                    if details_open {
-                        self.details_down(&ctx);
-                        continue;
-                    }
-                    if ctx.memory(|mem| mem.focused().is_none()) {
-                        self.needs_initial_focus = true;
-                    } else {
-                        ctx.memory_mut(|mem| mem.move_focus(egui::FocusDirection::Down));
-                    }
-                }
-                gilrs::EventType::ButtonPressed(gilrs::Button::DPadLeft, _) => {
-                    if details_open {
-                        self.details_left(&ctx);
-                        continue;
-                    }
-                    if ctx.memory(|mem| mem.focused().is_none()) {
-                        self.needs_initial_focus = true;
-                    } else {
-                        ctx.memory_mut(|mem| mem.move_focus(egui::FocusDirection::Left));
-                    }
-                }
-                gilrs::EventType::ButtonPressed(gilrs::Button::DPadRight, _) => {
-                    if details_open {
-                        self.details_right(&ctx);
-                        continue;
-                    }
-                    if ctx.memory(|mem| mem.focused().is_none()) {
-                        self.needs_initial_focus = true;
-                    } else {
-                        ctx.memory_mut(|mem| mem.move_focus(egui::FocusDirection::Right));
-                    }
-                }
-                gilrs::EventType::ButtonPressed(gilrs::Button::South, _) => {
-                    ctx.input_mut(|i| {
-                        i.events.push(egui::Event::Key {
-                            key: egui::Key::Enter,
-                            physical_key: None,
-                            pressed: true,
-                            repeat: false,
-                            modifiers: egui::Modifiers::NONE,
-                        })
-                    });
-                }
-                gilrs::EventType::ButtonReleased(gilrs::Button::South, _) => {
-                    ctx.input_mut(|i| {
-                        i.events.push(egui::Event::Key {
-                            key: egui::Key::Enter,
-                            physical_key: None,
-                            pressed: false,
-                            repeat: false,
-                            modifiers: egui::Modifiers::NONE,
-                        })
-                    });
-                }
-                gilrs::EventType::ButtonPressed(gilrs::Button::East, _) => {
-                    ctx.input_mut(|i| {
-                        i.events.push(egui::Event::Key {
-                            key: egui::Key::Escape,
-                            physical_key: None,
-                            pressed: true,
-                            repeat: false,
-                            modifiers: egui::Modifiers::NONE,
-                        })
-                    });
-                }
-                gilrs::EventType::ButtonReleased(gilrs::Button::East, _) => {
-                    ctx.input_mut(|i| {
-                        i.events.push(egui::Event::Key {
-                            key: egui::Key::Escape,
-                            physical_key: None,
-                            pressed: false,
-                            repeat: false,
-                            modifiers: egui::Modifiers::NONE,
-                        })
-                    });
-                }
-                _ => {}
-            }
-        }
+        crate::input::handle_gamepad(self, &ctx);
 
         ctx.request_repaint(); // Keep polling inputs
 
@@ -489,56 +382,9 @@ impl eframe::App for GooseModManager {
                 }
 
                 let details_open = self.selected_mod_url.is_some();
-                if details_open
-                    && ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape))
-                {
-                    self.close_details();
-                }
-                if details_open {
-                    if ui.input_mut(|i| consume_detail_key(i, egui::Key::ArrowUp)) {
-                        Self::details_up(ui.ctx());
-                    }
-                    if ui.input_mut(|i| consume_detail_key(i, egui::Key::ArrowDown)) {
-                        self.details_down(ui.ctx());
-                    }
-                    if ui.input_mut(|i| consume_detail_key(i, egui::Key::ArrowLeft)) {
-                        self.details_left(ui.ctx());
-                    }
-                    if ui.input_mut(|i| consume_detail_key(i, egui::Key::ArrowRight)) {
-                        self.details_right(ui.ctx());
-                    }
-                }
 
                 // ── KEYBOARD / GAMEPAD ARROW NAVIGATION ───────────────────────────
-                if !details_open {
-                    if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowUp)) {
-                        if ui.ctx().memory(|mem| mem.focused().is_some()) {
-                            ui.ctx()
-                                .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Up));
-                        }
-                    }
-                    if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowDown))
-                    {
-                        if ui.ctx().memory(|mem| mem.focused().is_some()) {
-                            ui.ctx()
-                                .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Down));
-                        }
-                    }
-                    if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowLeft))
-                    {
-                        if ui.ctx().memory(|mem| mem.focused().is_some()) {
-                            ui.ctx()
-                                .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Left));
-                        }
-                    }
-                    if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowRight))
-                    {
-                        if ui.ctx().memory(|mem| mem.focused().is_some()) {
-                            ui.ctx()
-                                .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Right));
-                        }
-                    }
-                }
+                crate::input::handle_keyboard(self, ui);
                 ui.spacing_mut().item_spacing = Vec2::new(10.0, 10.0);
 
                 // Dynamically compute responsive grid sizing

@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 mod app;
 mod icons;
+mod input;
 mod models;
 mod scraper;
 mod theme;

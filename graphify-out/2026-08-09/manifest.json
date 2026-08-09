@@ -5,8 +5,8 @@
     "semantic_hash": "7b1df4f0fcdee96e320ffa3d5c23e5d1"
   },
   "src/app.rs": {
-    "mtime": 1786261310.4815686,
-    "ast_hash": "2eb8f51c57230f909186cbc4190871f5",
+    "mtime": 1786139072.747491,
+    "ast_hash": "8bdf3d69c32aa2a9197fbdf8365b246c",
     "semantic_hash": ""
   },
   "src/bin/scraper.rs": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "src/main.rs": {
-    "mtime": 1786261310.830574,
-    "ast_hash": "b2b40a71b59046d4e7e0c2664ec7eec3",
+    "mtime": 1786136783.679158,
+    "ast_hash": "3e227b295d01e94d108b5646bc2c0ff7",
     "semantic_hash": ""
   },
   "src/models.rs": {
@@ -157,11 +157,6 @@
   "assets/design/Mod Details Dialog Window.png": {
     "mtime": 1786121727.5598648,
     "ast_hash": "85e101d317d3e3bf4d91bc6e1fc15fd9",
-    "semantic_hash": ""
-  },
-  "src/input.rs": {
-    "mtime": 1786261310.4605682,
-    "ast_hash": "2460f68569e4064dcf1744e78c86ad80",
     "semantic_hash": ""
   }
 }
