@@ -1,7 +1,6 @@
 /target
 /assets/thumbnails
 mods.json
-/graphify-out/cost.json
-/graphify-out/cache/
+/graphify-out
 /.codex
 /assets/design
