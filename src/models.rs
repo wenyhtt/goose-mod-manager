@@ -23,6 +23,15 @@ pub struct ModEntry {
     pub detail_image_bytes: Vec<egui::load::Bytes>,
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct ModVersion {
+    pub label: String,
+    pub size: String,
+    pub downloads: String,
+    pub published_at: String,
+    pub download_url: String,
+}
+
 impl ModEntry {
     pub fn new(
         name: &str,

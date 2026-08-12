@@ -19,6 +19,36 @@ pub fn consume_detail_key(input: &mut egui::InputState, key: egui::Key) -> bool 
 
 pub fn handle_gamepad(app: &mut GooseModManager, ctx: &egui::Context) {
     while let Some(gilrs::Event { event, .. }) = app.gilrs.next_event() {
+        if app.versions_dialog_open {
+            match event {
+                gilrs::EventType::ButtonPressed(gilrs::Button::DPadUp, _) => {
+                    ctx.memory_mut(|mem| mem.move_focus(egui::FocusDirection::Up));
+                }
+                gilrs::EventType::ButtonPressed(gilrs::Button::DPadDown, _) => {
+                    ctx.memory_mut(|mem| mem.move_focus(egui::FocusDirection::Down));
+                }
+                gilrs::EventType::ButtonPressed(gilrs::Button::DPadLeft, _) => {
+                    ctx.memory_mut(|mem| mem.move_focus(egui::FocusDirection::Left));
+                }
+                gilrs::EventType::ButtonPressed(gilrs::Button::DPadRight, _) => {
+                    ctx.memory_mut(|mem| mem.move_focus(egui::FocusDirection::Right));
+                }
+                gilrs::EventType::ButtonPressed(gilrs::Button::South, _) => ctx.input_mut(|i| {
+                    i.events.push(egui::Event::Key {
+                        key: egui::Key::Enter,
+                        physical_key: None,
+                        pressed: true,
+                        repeat: false,
+                        modifiers: egui::Modifiers::NONE,
+                    })
+                }),
+                gilrs::EventType::ButtonPressed(gilrs::Button::East, _) => {
+                    app.close_versions_dialog()
+                }
+                _ => {}
+            }
+            continue;
+        }
         let details_open = app.selected_mod_url.is_some();
         match event {
             gilrs::EventType::ButtonPressed(gilrs::Button::DPadUp, _) => {
@@ -115,6 +145,28 @@ pub fn handle_gamepad(app: &mut GooseModManager, ctx: &egui::Context) {
 }
 
 pub fn handle_keyboard(app: &mut GooseModManager, ui: &mut egui::Ui) {
+    if app.versions_dialog_open {
+        if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape)) {
+            app.close_versions_dialog();
+        }
+        if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowUp)) {
+            ui.ctx()
+                .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Up));
+        }
+        if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowDown)) {
+            ui.ctx()
+                .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Down));
+        }
+        if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowLeft)) {
+            ui.ctx()
+                .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Left));
+        }
+        if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowRight)) {
+            ui.ctx()
+                .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Right));
+        }
+        return;
+    }
     let details_open = app.selected_mod_url.is_some();
     if details_open && ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape)) {
         app.close_details();

@@ -1,11 +1,11 @@
 use scraper::{ElementRef, Html, Selector};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
 use std::time::Duration;
 
-use crate::models::ModEntry;
+use crate::models::{ModEntry, ModVersion};
 
 pub struct ModDetails {
     pub likes: String,
@@ -235,6 +235,41 @@ pub fn run_details(url: &str) -> Result<ModDetails, Box<dyn std::error::Error>> 
     })
 }
 
+pub fn fetch_versions(url: &str) -> Result<Vec<ModVersion>, Box<dyn std::error::Error>> {
+    let client = reqwest::blocking::Client::builder()
+        .timeout(Duration::from_secs(15))
+        .build()?;
+    let html = client.get(url).send()?.error_for_status()?.text()?;
+    Ok(extract_versions(&Html::parse_document(&html)))
+}
+
+pub fn download_version(version: &ModVersion) -> Result<PathBuf, Box<dyn std::error::Error>> {
+    let client = reqwest::blocking::Client::builder()
+        .timeout(Duration::from_secs(60))
+        .build()?;
+    let response = client
+        .get(&version.download_url)
+        .send()?
+        .error_for_status()?;
+    let filename = response
+        .headers()
+        .get(reqwest::header::CONTENT_DISPOSITION)
+        .and_then(|value| value.to_str().ok())
+        .and_then(filename_from_content_disposition)
+        .unwrap_or_else(|| fallback_archive_name(&version.label));
+    let downloads = cache_dir().join("downloads");
+    fs::create_dir_all(&downloads)?;
+    let path = downloads.join(filename);
+    let temporary = path.with_extension("part");
+    let bytes = response.bytes()?;
+    if bytes.is_empty() {
+        return Err("Downloaded archive was empty".into());
+    }
+    fs::write(&temporary, &bytes)?;
+    fs::rename(&temporary, &path)?;
+    Ok(path)
+}
+
 struct ExtractedDetails {
     likes: String,
     downloads: String,
@@ -265,6 +300,137 @@ fn extract_details(document: &Html) -> ExtractedDetails {
             .map(absolute_url)
             .collect(),
     }
+}
+
+fn extract_versions(document: &Html) -> Vec<ModVersion> {
+    let container_selector = Selector::parse(".file-version-container").unwrap();
+    let link_selector = Selector::parse("a[href*='/download/']").unwrap();
+    let downloads_selector = Selector::parse(".num-downloads").unwrap();
+    let size_selector = Selector::parse(".file-size").unwrap();
+    let date_selector = Selector::parse(".file-date").unwrap();
+
+    let mut seen = HashSet::new();
+
+    document
+        .select(&container_selector)
+        .filter_map(|entry| {
+            let download_url = entry
+                .select(&link_selector)
+                .find_map(|link| link.value().attr("href"))
+                .map(absolute_url)?;
+            if !seen.insert(download_url.clone()) {
+                return None;
+            }
+            let label = extract_version_label(entry)?;
+            let text = element_text(entry);
+            Some(ModVersion {
+                label,
+                size: entry
+                    .select(&size_selector)
+                    .next()
+                    .map(element_text)
+                    .and_then(clean_size)
+                    .or_else(|| extract_size(&text))
+                    .unwrap_or_default(),
+                downloads: entry
+                    .select(&downloads_selector)
+                    .next()
+                    .map(element_text)
+                    .and_then(|text| first_count(&text))
+                    .or_else(|| first_count(&text))
+                    .unwrap_or_default(),
+                published_at: entry
+                    .select(&date_selector)
+                    .next()
+                    .map(element_text)
+                    .or_else(|| extract_date(&text))
+                    .unwrap_or_default(),
+                download_url,
+            })
+        })
+        .collect()
+}
+
+fn clean_size(text: String) -> Option<String> {
+    let text = text.trim().trim_start_matches(',').trim();
+    (!text.is_empty()).then(|| text.to_string())
+}
+
+fn extract_version_label(entry: ElementRef<'_>) -> Option<String> {
+    let mut label = String::new();
+    for text in entry
+        .text()
+        .map(|text| text.replace('\u{a0}', " "))
+        .map(|text| text.trim().to_string())
+        .filter(|text| !text.is_empty())
+    {
+        if label.is_empty() {
+            label = text;
+        } else if text.starts_with('(') {
+            label.push(' ');
+            label.push_str(&text);
+        } else {
+            break;
+        }
+    }
+    (!label.is_empty()).then_some(label)
+}
+
+fn extract_size(text: &str) -> Option<String> {
+    text.split_whitespace()
+        .collect::<Vec<_>>()
+        .windows(2)
+        .find(|parts| matches!(parts[1], "B" | "KB" | "MB" | "GB"))
+        .map(|parts| format!("{} {}", parts[0], parts[1]))
+}
+
+fn extract_date(text: &str) -> Option<String> {
+    let months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ];
+    let words = text.split_whitespace().collect::<Vec<_>>();
+    words
+        .iter()
+        .position(|word| months.contains(word))
+        .and_then(|index| {
+            words
+                .get(index..index + 3)
+                .map(|date| date.join(" ").trim_end_matches(',').to_string())
+        })
+}
+
+fn filename_from_content_disposition(value: &str) -> Option<String> {
+    value.split(';').find_map(|part| {
+        part.trim()
+            .strip_prefix("filename=")
+            .map(|name| safe_filename(name.trim_matches('"')))
+            .filter(|name| !name.is_empty())
+    })
+}
+
+fn fallback_archive_name(label: &str) -> String {
+    let label = safe_filename(label);
+    format!("{}.zip", if label.is_empty() { "mod" } else { &label })
+}
+
+fn safe_filename(value: &str) -> String {
+    value
+        .chars()
+        .filter(|character| {
+            character.is_ascii_alphanumeric() || matches!(character, '.' | '-' | '_')
+        })
+        .collect()
 }
 
 fn absolute_url(url: &str) -> String {
@@ -396,5 +562,59 @@ mod tests {
                 "https://img.gta5-mods.com/q95/images/mod/two.png"
             ]
         );
+    }
+
+    #[test]
+    fn extracts_all_versions_with_download_links() {
+        let document = Html::parse_fragment(
+            r#"
+            <div class="well pull-left file-version-container">
+              <div class="pull-left">
+                <i class="fa fa-file"></i>&nbsp;1.0.13 <span>(current)</span>
+                <p>
+                  <span class="num-downloads">1,017,488 downloads <span class="file-size">, 9.14 MB</span></span>
+                </p>
+                <p>June 30, 2020</p>
+              </div>
+              <div class="pull-right">
+                <a target="_blank" href="https://www.virustotal.com/example"><i class="fa fa-shield vt-version"></i></a>
+                <a target="_blank" href="/tools/gta-v-launcher/download/94658"><i class="fa fa-download download-version"></i></a>
+              </div>
+            </div>
+            <div class="well pull-left file-version-container">
+              <div class="pull-left">
+                <i class="fa fa-file"></i>&nbsp;1.0.13 <span>(current)</span>
+                <p>
+                  <span class="num-downloads">1,017,488 downloads <span class="file-size">, 9.14 MB</span></span>
+                </p>
+                <p>June 30, 2020</p>
+              </div>
+              <div class="pull-right">
+                <a target="_blank" href="/tools/gta-v-launcher/download/94658"><i class="fa fa-download download-version"></i></a>
+              </div>
+            </div>
+            "#,
+        );
+
+        assert_eq!(
+            extract_versions(&document),
+            vec![ModVersion {
+                label: "1.0.13 (current)".to_string(),
+                size: "9.14 MB".to_string(),
+                downloads: "1,017,488".to_string(),
+                published_at: "June 30, 2020".to_string(),
+                download_url: "https://www.gta5-mods.com/tools/gta-v-launcher/download/94658"
+                    .to_string(),
+            }]
+        );
+    }
+
+    #[test]
+    fn archive_filenames_are_safe() {
+        assert_eq!(
+            filename_from_content_disposition("attachment; filename=mod.zip"),
+            Some("mod.zip".to_string())
+        );
+        assert_eq!(fallback_archive_name("v2.0 / test"), "v2.0test.zip");
     }
 }

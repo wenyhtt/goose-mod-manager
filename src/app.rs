@@ -1,4 +1,4 @@
-use crate::models::{ModEntry, SortOption, Tab};
+use crate::models::{ModEntry, ModVersion, SortOption, Tab};
 use crate::theme::{noto_sans_bold, BG_DARK, FONT_EMPTY, TEXT_WHITE};
 use crate::ui;
 use eframe::egui::{self, Frame, Margin, Vec2};
@@ -19,8 +19,15 @@ pub struct GooseModManager {
     pub selected_mod_url: Option<String>,
     pub detail_image_offset: usize,
     pub details_just_opened: bool,
+    pub versions_dialog_open: bool,
+    pub versions_dialog_just_opened: bool,
+    pub versions: Vec<ModVersion>,
+    pub versions_error: Option<String>,
+    pub download_status: Option<String>,
     scrape_task: Option<JoinHandle<Result<(usize, Vec<ModEntry>), String>>>,
     detail_task: Option<JoinHandle<(String, Result<crate::scraper::ModDetails, String>)>>,
+    version_task: Option<JoinHandle<Result<Vec<ModVersion>, String>>>,
+    download_task: Option<JoinHandle<Result<std::path::PathBuf, String>>>,
     failed_detail_url: Option<String>,
     next_scrape_page: usize,
     has_more_scrape_pages: bool,
@@ -48,8 +55,15 @@ impl Default for GooseModManager {
             selected_mod_url: None,
             detail_image_offset: 0,
             details_just_opened: false,
+            versions_dialog_open: false,
+            versions_dialog_just_opened: false,
+            versions: Vec::new(),
+            versions_error: None,
+            download_status: None,
             scrape_task,
             detail_task: None,
+            version_task: None,
+            download_task: None,
             failed_detail_url: None,
             next_scrape_page: 2,
             has_more_scrape_pages: true,
@@ -206,6 +220,76 @@ impl GooseModManager {
         }
     }
 
+    fn refresh_versions_fetch(&mut self) {
+        let Some(task) = self.version_task.take() else {
+            return;
+        };
+        if !task.is_finished() {
+            self.version_task = Some(task);
+            return;
+        }
+        match task.join() {
+            Ok(Ok(versions)) if versions.is_empty() => {
+                self.versions_error = Some("No downloadable versions found.".to_string());
+            }
+            Ok(Ok(versions)) => self.versions = versions,
+            Ok(Err(error)) => self.versions_error = Some(error),
+            Err(_) => self.versions_error = Some("Fetching versions failed.".to_string()),
+        }
+    }
+
+    fn refresh_version_download(&mut self) {
+        let Some(task) = self.download_task.take() else {
+            return;
+        };
+        if !task.is_finished() {
+            self.download_task = Some(task);
+            return;
+        }
+        self.download_status = Some(match task.join() {
+            Ok(Ok(path)) => format!("Saved to {}", path.display()),
+            Ok(Err(error)) => format!("Download failed: {error}"),
+            Err(_) => "Download failed.".to_string(),
+        });
+    }
+
+    pub fn open_versions_dialog(&mut self) {
+        let Some(url) = self.selected_mod_url.clone() else {
+            return;
+        };
+        self.versions_dialog_open = true;
+        self.versions_dialog_just_opened = true;
+        self.versions.clear();
+        self.versions_error = None;
+        self.download_status = None;
+        self.version_task = Some(std::thread::spawn(move || {
+            crate::scraper::fetch_versions(&url).map_err(|error| error.to_string())
+        }));
+    }
+
+    pub fn close_versions_dialog(&mut self) {
+        self.versions_dialog_open = false;
+        self.versions_dialog_just_opened = false;
+    }
+
+    pub fn start_version_download(&mut self, version: ModVersion) {
+        if self.download_task.is_some() {
+            return;
+        }
+        self.download_status = Some(format!("Downloading {}...", version.label));
+        self.download_task = Some(std::thread::spawn(move || {
+            crate::scraper::download_version(&version).map_err(|error| error.to_string())
+        }));
+    }
+
+    pub fn versions_loading(&self) -> bool {
+        self.version_task.is_some()
+    }
+
+    pub fn version_downloading(&self) -> bool {
+        self.download_task.is_some()
+    }
+
     pub fn open_details(&mut self, index: usize) {
         if let Some(mod_entry) = self.mods.get(index) {
             self.selected_mod_url = Some(mod_entry.url.clone());
@@ -215,6 +299,7 @@ impl GooseModManager {
     }
 
     pub fn close_details(&mut self) {
+        self.close_versions_dialog();
         self.selected_mod_url = None;
         self.detail_image_offset = 0;
     }
@@ -345,6 +430,8 @@ impl eframe::App for GooseModManager {
         self.refresh_scrape_if_needed();
         self.refresh_detail_fetch();
         self.fetch_selected_details_if_needed();
+        self.refresh_versions_fetch();
+        self.refresh_version_download();
         let ctx = ui.ctx().clone();
 
         // ── GAMEPAD INPUT HANDLING ─────────────────────────────────────────
@@ -422,6 +509,7 @@ impl eframe::App for GooseModManager {
                 });
 
                 ui::details::render_details(self, ui.ctx());
+                ui::versions::render_versions(self, ui.ctx());
             });
     }
 }

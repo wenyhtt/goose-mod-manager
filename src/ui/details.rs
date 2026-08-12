@@ -157,13 +157,17 @@ fn paint_images(ui: &mut egui::Ui, app: &mut GooseModManager, mod_entry: &ModEnt
 
 fn paint_footer(ui: &mut egui::Ui, app: &mut GooseModManager, mod_entry: &ModEntry, rect: Rect) {
     let y = rect.bottom() - 52.0;
-    dialog_button(
+    if dialog_button(
         ui,
         "detail_install",
         Rect::from_min_size(Pos2::new(rect.left(), y), Vec2::new(122.0, 46.0)),
         "INSTALL",
-        false,
-    );
+        true,
+    )
+    .clicked()
+    {
+        app.open_versions_dialog();
+    }
     if dialog_button(
         ui,
         DETAIL_VIEW_WEB_ID,

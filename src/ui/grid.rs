@@ -2,8 +2,8 @@ use crate::app::GooseModManager;
 use crate::icons::paint_download_icon;
 use crate::models::ModEntry;
 use crate::theme::{
-    CARD_BG, CARD_BG_HOVER, CARD_RADIUS, FOCUS_COLOR, FONT_SM, FONT_XS, ICON_COLOR, TEXT_WHITE,
-    noto_sans_bold, noto_sans_light, noto_sans_regular,
+    noto_sans_bold, noto_sans_light, noto_sans_regular, CARD_BG, CARD_BG_HOVER, CARD_RADIUS,
+    FOCUS_COLOR, FONT_SM, FONT_XS, ICON_COLOR, TEXT_WHITE,
 };
 use crate::ui::images::{bytes_image, fallback_image, paint_cover_image};
 use eframe::egui::{self, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Vec2};
