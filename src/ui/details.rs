@@ -257,9 +257,6 @@ fn dialog_button(
 
 fn arrow_button(ui: &mut egui::Ui, id: &str, rect: Rect, right: bool) -> egui::Response {
     let response = ui.interact(rect, Id::new(id), Sense::click());
-    if response.clicked() {
-        response.request_focus();
-    }
     let bg = if response.hovered() {
         CARD_BG_HOVER
     } else {
