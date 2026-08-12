@@ -1,5 +1,5 @@
 use crate::models::{ModEntry, ModVersion, SortOption, Tab};
-use crate::theme::{noto_sans_bold, BG_DARK, FONT_EMPTY, TEXT_WHITE};
+use crate::theme::{BG_DARK, FONT_EMPTY, TEXT_WHITE, noto_sans_bold};
 use crate::ui;
 use eframe::egui::{self, Frame, Margin, Vec2};
 use std::thread::JoinHandle;
@@ -247,9 +247,18 @@ impl GooseModManager {
             return;
         }
         self.download_status = Some(match task.join() {
-            Ok(Ok(path)) => format!("Saved to {}", path.display()),
-            Ok(Err(error)) => format!("Download failed: {error}"),
-            Err(_) => "Download failed.".to_string(),
+            Ok(Ok(path)) => {
+                eprintln!("Download task saved {}", path.display());
+                format!("Saved to {}", path.display())
+            }
+            Ok(Err(error)) => {
+                eprintln!("Download task failed: {error}");
+                format!("Download failed: {error}")
+            }
+            Err(_) => {
+                eprintln!("Download task panicked");
+                "Download failed.".to_string()
+            }
         });
     }
 
@@ -276,6 +285,7 @@ impl GooseModManager {
         if self.download_task.is_some() {
             return;
         }
+        eprintln!("Starting download task: {}", version.label);
         self.download_status = Some(format!("Downloading {}...", version.label));
         self.download_task = Some(std::thread::spawn(move || {
             crate::scraper::download_version(&version).map_err(|error| error.to_string())

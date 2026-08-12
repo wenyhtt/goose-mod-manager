@@ -1,8 +1,8 @@
 use crate::icons::{paint_left_arrow, paint_right_arrow};
 use crate::models::IconKind;
 use crate::theme::{
-    noto_sans_bold, CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, FONT_MD, ICON_BTN_SIZE, ICON_COLOR,
-    PILL_HEIGHT, PILL_RADIUS, PILL_WIDTH, TAB_ACTIVE, TAB_INACTIVE, TEXT_WHITE,
+    CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, FONT_MD, ICON_BTN_SIZE, ICON_COLOR, PILL_HEIGHT,
+    PILL_RADIUS, PILL_WIDTH, TAB_ACTIVE, TAB_INACTIVE, TEXT_WHITE, noto_sans_bold,
 };
 use eframe::egui::{self, CornerRadius, Stroke, StrokeKind, Vec2};
 

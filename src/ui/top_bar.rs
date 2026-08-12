@@ -2,8 +2,8 @@ use crate::app::GooseModManager;
 use crate::icons::paint_dropdown_arrow;
 use crate::models::{IconKind, SortOption, Tab};
 use crate::theme::{
-    noto_sans_bold, noto_sans_regular, BG_DARK, CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, FONT_MD,
-    FONT_SM, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS, TEXT_WHITE,
+    BG_DARK, CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, FONT_MD, FONT_SM, ICON_COLOR, PILL_HEIGHT,
+    PILL_RADIUS, TEXT_WHITE, noto_sans_bold, noto_sans_regular,
 };
 use crate::ui::widgets::{icon_button, pill_button};
 use eframe::egui::{

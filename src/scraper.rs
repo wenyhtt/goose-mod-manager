@@ -244,29 +244,80 @@ pub fn fetch_versions(url: &str) -> Result<Vec<ModVersion>, Box<dyn std::error::
 }
 
 pub fn download_version(version: &ModVersion) -> Result<PathBuf, Box<dyn std::error::Error>> {
+    eprintln!("Download requested: {}", version.label);
     let client = reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(60))
+        .cookie_store(true)
         .build()?;
-    let response = client
-        .get(&version.download_url)
+    let mod_url = mod_page_url(&version.download_url).ok_or("Invalid download URL")?;
+    eprintln!("Opening mod page: {mod_url}");
+    client
+        .get(&mod_url)
+        .header(reqwest::header::ACCEPT_ENCODING, "identity")
         .send()?
         .error_for_status()?;
+    eprintln!("Opening download page: {}", version.download_url);
+    let download_response = client
+        .get(&version.download_url)
+        .header(reqwest::header::REFERER, &mod_url)
+        .header(reqwest::header::ACCEPT_ENCODING, "identity")
+        .send()?
+        .error_for_status()?;
+    if is_archive_response(&download_response) {
+        eprintln!("Download page returned archive directly");
+        return save_archive(download_response, version, None);
+    }
+    let download_page = String::from_utf8_lossy(&download_response.bytes()?).into_owned();
+    let archive_url = extract_archive_url(&Html::parse_document(&download_page))
+        .ok_or("Download page did not include an archive link")?;
+    eprintln!("Resolved archive URL: {archive_url}");
+    let archive_response = client
+        .get(&archive_url)
+        .header(reqwest::header::REFERER, &version.download_url)
+        .header(reqwest::header::ACCEPT_ENCODING, "identity")
+        .send()?
+        .error_for_status()?;
+    save_archive(archive_response, version, filename_from_url(&archive_url))
+}
+
+fn is_archive_response(response: &reqwest::blocking::Response) -> bool {
+    response
+        .headers()
+        .contains_key(reqwest::header::CONTENT_DISPOSITION)
+        || response
+            .headers()
+            .get(reqwest::header::CONTENT_TYPE)
+            .and_then(|value| value.to_str().ok())
+            .is_some_and(|content_type| {
+                content_type.contains("application/zip")
+                    || content_type.contains("application/octet-stream")
+            })
+}
+
+fn save_archive(
+    response: reqwest::blocking::Response,
+    version: &ModVersion,
+    filename_hint: Option<String>,
+) -> Result<PathBuf, Box<dyn std::error::Error>> {
     let filename = response
         .headers()
         .get(reqwest::header::CONTENT_DISPOSITION)
         .and_then(|value| value.to_str().ok())
         .and_then(filename_from_content_disposition)
+        .or(filename_hint)
         .unwrap_or_else(|| fallback_archive_name(&version.label));
     let downloads = cache_dir().join("downloads");
     fs::create_dir_all(&downloads)?;
     let path = downloads.join(filename);
     let temporary = path.with_extension("part");
+    eprintln!("Saving archive to {}", path.display());
     let bytes = response.bytes()?;
     if bytes.is_empty() {
         return Err("Downloaded archive was empty".into());
     }
     fs::write(&temporary, &bytes)?;
     fs::rename(&temporary, &path)?;
+    eprintln!("Download complete: {}", path.display());
     Ok(path)
 }
 
@@ -300,6 +351,13 @@ fn extract_details(document: &Html) -> ExtractedDetails {
             .map(absolute_url)
             .collect(),
     }
+}
+
+fn extract_archive_url(document: &Html) -> Option<String> {
+    document
+        .select(&Selector::parse("#file-download a.btn-download[href]").unwrap())
+        .find_map(|link| link.value().attr("href"))
+        .map(absolute_url)
 }
 
 fn extract_versions(document: &Html) -> Vec<ModVersion> {
@@ -417,6 +475,21 @@ fn filename_from_content_disposition(value: &str) -> Option<String> {
             .map(|name| safe_filename(name.trim_matches('"')))
             .filter(|name| !name.is_empty())
     })
+}
+
+fn filename_from_url(url: &str) -> Option<String> {
+    url.split('?')
+        .next()
+        .and_then(|url| url.rsplit('/').next())
+        .map(|filename| filename.replace("%20", "_"))
+        .map(|filename| safe_filename(&filename))
+        .filter(|filename| !filename.is_empty())
+}
+
+fn mod_page_url(download_url: &str) -> Option<String> {
+    download_url
+        .rsplit_once("/download/")
+        .map(|(mod_url, _)| mod_url.to_string())
 }
 
 fn fallback_archive_name(label: &str) -> String {
@@ -606,6 +679,34 @@ mod tests {
                 download_url: "https://www.gta5-mods.com/tools/gta-v-launcher/download/94658"
                     .to_string(),
             }]
+        );
+    }
+
+    #[test]
+    fn extracts_archive_url_from_download_page() {
+        let document = Html::parse_fragment(
+            r#"
+            <a class="btn btn-primary btn-download" href="/wrong/place.zip">Download</a>
+            <div id="file-download">
+              <a class="btn btn-primary btn-download" href="https://files.gta5-mods.com/uploads/gta-v-launcher/47b596-GTA%20V%20Launcher.zip">Download</a>
+            </div>
+            "#,
+        );
+
+        assert_eq!(
+            extract_archive_url(&document),
+            Some(
+                "https://files.gta5-mods.com/uploads/gta-v-launcher/47b596-GTA%20V%20Launcher.zip"
+                    .to_string()
+            )
+        );
+        assert_eq!(
+            filename_from_url("https://files.gta5-mods.com/uploads/mod/GTA%20V%20Launcher.zip"),
+            Some("GTA_V_Launcher.zip".to_string())
+        );
+        assert_eq!(
+            mod_page_url("https://www.gta5-mods.com/tools/gta-v-launcher/download/94658"),
+            Some("https://www.gta5-mods.com/tools/gta-v-launcher".to_string())
         );
     }
 
