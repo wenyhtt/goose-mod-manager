@@ -1,5 +1,5 @@
 use crate::models::{ModEntry, SortOption, Tab};
-use crate::theme::{BG_DARK, TEXT_WHITE};
+use crate::theme::{noto_sans_bold, BG_DARK, FONT_EMPTY, TEXT_WHITE};
 use crate::ui;
 use eframe::egui::{self, Frame, Margin, Vec2};
 use std::thread::JoinHandle;
@@ -414,10 +414,7 @@ impl eframe::App for GooseModManager {
                         ui.centered_and_justified(|ui| {
                             ui.label(
                                 egui::RichText::new("Oops.. we ain't ready yet")
-                                    .font(egui::FontId::new(
-                                        36.0,
-                                        egui::FontFamily::Name("Poppins".into()),
-                                    ))
+                                    .font(noto_sans_bold(FONT_EMPTY))
                                     .color(TEXT_WHITE),
                             );
                         });

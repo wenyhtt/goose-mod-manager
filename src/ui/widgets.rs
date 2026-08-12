@@ -1,8 +1,8 @@
 use crate::icons::{paint_left_arrow, paint_right_arrow};
 use crate::models::IconKind;
 use crate::theme::{
-    CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_BTN_SIZE, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS,
-    PILL_WIDTH, TAB_ACTIVE, TAB_INACTIVE, TEXT_WHITE, poppins,
+    noto_sans_bold, CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, FONT_MD, ICON_BTN_SIZE, ICON_COLOR,
+    PILL_HEIGHT, PILL_RADIUS, PILL_WIDTH, TAB_ACTIVE, TAB_INACTIVE, TEXT_WHITE,
 };
 use eframe::egui::{self, CornerRadius, Stroke, StrokeKind, Vec2};
 
@@ -25,7 +25,7 @@ pub fn pill_button(ui: &mut egui::Ui, id_source: &str, text: &str, active: bool)
         rect.center(),
         egui::Align2::CENTER_CENTER,
         text,
-        poppins(),
+        noto_sans_bold(FONT_MD),
         TEXT_WHITE,
     );
 

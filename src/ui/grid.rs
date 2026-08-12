@@ -2,8 +2,8 @@ use crate::app::GooseModManager;
 use crate::icons::paint_download_icon;
 use crate::models::ModEntry;
 use crate::theme::{
-    CARD_BG, CARD_BG_HOVER, CARD_RADIUS, FOCUS_COLOR, ICON_COLOR, TEXT_WHITE, poppins_sm,
-    poppins_xs,
+    CARD_BG, CARD_BG_HOVER, CARD_RADIUS, FOCUS_COLOR, FONT_SM, FONT_XS, ICON_COLOR, TEXT_WHITE,
+    noto_sans_bold, noto_sans_light, noto_sans_regular,
 };
 use crate::ui::images::{bytes_image, fallback_image, paint_cover_image};
 use eframe::egui::{self, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Vec2};
@@ -164,7 +164,7 @@ fn paint_card(
             format!("v{}", mod_entry.version)
         };
         let text_size = painter
-            .layout_no_wrap(version.clone(), poppins_xs(), TEXT_WHITE)
+            .layout_no_wrap(version.clone(), noto_sans_regular(FONT_XS), TEXT_WHITE)
             .size();
         let badge_size = text_size + Vec2::new(16.0, 8.0);
         let badge = Rect::from_min_size(
@@ -179,7 +179,7 @@ fn paint_card(
             badge.center(),
             egui::Align2::CENTER_CENTER,
             version,
-            poppins_xs(),
+            noto_sans_regular(FONT_XS),
             TEXT_WHITE,
         );
     }
@@ -197,7 +197,7 @@ fn paint_card(
         category_rect,
         egui::Label::new(
             egui::RichText::new(&mod_entry.category)
-                .font(poppins_xs())
+                .font(noto_sans_light(FONT_XS))
                 .color(TEXT_WHITE.gamma_multiply(0.65)),
         )
         .truncate(),
@@ -211,7 +211,7 @@ fn paint_card(
         name_rect,
         egui::Label::new(
             egui::RichText::new(&mod_entry.name)
-                .font(poppins_sm())
+                .font(noto_sans_bold(FONT_SM))
                 .color(TEXT_WHITE),
         )
         .truncate(),
@@ -225,7 +225,7 @@ fn paint_card(
             Pos2::new(rect.left() + info_padding, bottom_y),
             egui::Align2::LEFT_CENTER,
             format!("By {}", mod_entry.author),
-            poppins_xs(),
+            noto_sans_light(FONT_XS),
             TEXT_WHITE.gamma_multiply(0.65),
         );
     }
@@ -235,12 +235,12 @@ fn paint_card(
             Pos2::new(rect.right() - info_padding - 22.0, bottom_y),
             egui::Align2::RIGHT_CENTER,
             &mod_entry.downloads,
-            poppins_xs(),
+            noto_sans_regular(FONT_XS),
             TEXT_WHITE,
         );
     }
 
     // Download icon
-    let icon_center = Pos2::new(rect.right() - info_padding - 8.0, bottom_y - 3.0);
+    let icon_center = Pos2::new(rect.right() - info_padding - 8.0, bottom_y - 1.0);
     paint_download_icon(painter, icon_center, 16.0, ICON_COLOR);
 }

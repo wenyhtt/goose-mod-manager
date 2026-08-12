@@ -116,9 +116,7 @@ pub fn handle_gamepad(app: &mut GooseModManager, ctx: &egui::Context) {
 
 pub fn handle_keyboard(app: &mut GooseModManager, ui: &mut egui::Ui) {
     let details_open = app.selected_mod_url.is_some();
-    if details_open
-        && ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape))
-    {
+    if details_open && ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape)) {
         app.close_details();
     }
     if details_open {
@@ -143,22 +141,19 @@ pub fn handle_keyboard(app: &mut GooseModManager, ui: &mut egui::Ui) {
                     .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Up));
             }
         }
-        if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowDown))
-        {
+        if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowDown)) {
             if ui.ctx().memory(|mem| mem.focused().is_some()) {
                 ui.ctx()
                     .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Down));
             }
         }
-        if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowLeft))
-        {
+        if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowLeft)) {
             if ui.ctx().memory(|mem| mem.focused().is_some()) {
                 ui.ctx()
                     .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Left));
             }
         }
-        if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowRight))
-        {
+        if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::ArrowRight)) {
             if ui.ctx().memory(|mem| mem.focused().is_some()) {
                 ui.ctx()
                     .memory_mut(|mem| mem.move_focus(egui::FocusDirection::Right));

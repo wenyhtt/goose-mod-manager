@@ -2,8 +2,8 @@ use crate::app::GooseModManager;
 use crate::icons::paint_dropdown_arrow;
 use crate::models::{IconKind, SortOption, Tab};
 use crate::theme::{
-    BG_DARK, CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS, TEXT_WHITE,
-    poppins, poppins_sm,
+    noto_sans_bold, noto_sans_regular, BG_DARK, CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, FONT_MD,
+    FONT_SM, ICON_COLOR, PILL_HEIGHT, PILL_RADIUS, TEXT_WHITE,
 };
 use crate::ui::widgets::{icon_button, pill_button};
 use eframe::egui::{
@@ -120,7 +120,7 @@ fn render_sort_controls(app: &mut GooseModManager, ui: &mut egui::Ui, top_right:
         Pos2::new(left, top + PILL_HEIGHT / 2.0),
         egui::Align2::LEFT_CENTER,
         "SORT BY",
-        poppins_sm(),
+        noto_sans_regular(FONT_SM),
         TEXT_WHITE,
     );
 
@@ -141,7 +141,7 @@ fn render_sort_controls(app: &mut GooseModManager, ui: &mut egui::Ui, top_right:
         Pos2::new(dropdown_rect.left() + 22.0, dropdown_rect.center().y),
         egui::Align2::LEFT_CENTER,
         app.sort_by.label(),
-        poppins(),
+        noto_sans_bold(FONT_MD),
         TEXT_WHITE,
     );
 
@@ -210,7 +210,7 @@ fn render_sort_controls(app: &mut GooseModManager, ui: &mut egui::Ui, top_right:
                         Pos2::new(item_rect.left() + 22.0, item_rect.center().y),
                         egui::Align2::LEFT_CENTER,
                         option.label(),
-                        poppins_sm(),
+                        noto_sans_regular(FONT_SM),
                         text_color,
                     );
                     if clicked {

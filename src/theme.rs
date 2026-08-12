@@ -18,14 +18,31 @@ pub const CARD_RADIUS: u8 = 24;
 pub const PILL_RADIUS: u8 = 50;
 
 // ── Fonts ────────────────────────────────────────────────────────────────────
-pub fn poppins() -> FontId {
-    FontId::new(24.0, FontFamily::Name("Poppins".into()))
+pub const FONT_XS: f32 = 14.0;
+pub const FONT_SM: f32 = 20.0;
+pub const FONT_MD: f32 = 24.0;
+pub const FONT_EMPTY: f32 = 36.0;
+
+pub const FONT_WEIGHT_LIGHT: f32 = 300.0;
+pub const FONT_WEIGHT_REGULAR: f32 = 400.0;
+pub const FONT_WEIGHT_BOLD: f32 = 700.0;
+pub const FONT_WEIGHT_AXIS: &[u8; 4] = b"wght";
+
+pub const NOTO_SANS_LIGHT_FACE: &str = "NotoSans-Light";
+pub const NOTO_SANS_REGULAR_FACE: &str = "NotoSans-Regular";
+pub const NOTO_SANS_BOLD_FACE: &str = "NotoSans-Bold";
+pub const NOTO_SANS_LIGHT: &str = "NotoSansLight";
+pub const NOTO_SANS_REGULAR: &str = "NotoSansRegular";
+pub const NOTO_SANS_BOLD: &str = "NotoSansBold";
+
+pub fn noto_sans_light(size: f32) -> FontId {
+    FontId::new(size, FontFamily::Name(NOTO_SANS_LIGHT.into()))
 }
 
-pub fn poppins_sm() -> FontId {
-    FontId::new(20.0, FontFamily::Name("Poppins".into()))
+pub fn noto_sans_regular(size: f32) -> FontId {
+    FontId::new(size, FontFamily::Name(NOTO_SANS_REGULAR.into()))
 }
 
-pub fn poppins_xs() -> FontId {
-    FontId::new(14.0, FontFamily::Name("Poppins".into()))
+pub fn noto_sans_bold(size: f32) -> FontId {
+    FontId::new(size, FontFamily::Name(NOTO_SANS_BOLD.into()))
 }

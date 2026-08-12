@@ -2,8 +2,8 @@ use crate::app::GooseModManager;
 use crate::icons::{paint_download_icon, paint_heart_icon, paint_left_arrow, paint_right_arrow};
 use crate::models::ModEntry;
 use crate::theme::{
-    BG_DARK, CARD_BG, CARD_BG_HOVER, FOCUS_COLOR, ICON_COLOR, TEXT_WHITE, poppins, poppins_sm,
-    poppins_xs,
+    noto_sans_bold, noto_sans_light, noto_sans_regular, BG_DARK, CARD_BG, CARD_BG_HOVER,
+    FOCUS_COLOR, FONT_MD, FONT_SM, FONT_XS, ICON_COLOR, TEXT_WHITE,
 };
 use crate::ui::images::{bytes_image, fallback_image, paint_cover_image};
 use eframe::egui::{self, Color32, CornerRadius, Id, Pos2, Rect, Sense, Stroke, StrokeKind, Vec2};
@@ -79,7 +79,7 @@ fn paint_header(ui: &mut egui::Ui, mod_entry: &ModEntry, rect: Rect) {
             ui.add(
                 egui::Label::new(
                     egui::RichText::new(&mod_entry.name)
-                        .font(poppins())
+                        .font(noto_sans_bold(FONT_MD))
                         .color(TEXT_WHITE),
                 )
                 .truncate(),
@@ -92,7 +92,7 @@ fn paint_header(ui: &mut egui::Ui, mod_entry: &ModEntry, rect: Rect) {
             Pos2::new(rect.left(), rect.top() + 44.0),
             egui::Align2::LEFT_CENTER,
             format!("By {}", mod_entry.author),
-            poppins_xs(),
+            noto_sans_light(FONT_XS),
             TEXT_WHITE.gamma_multiply(0.65),
         );
     }
@@ -245,7 +245,7 @@ fn dialog_button(
         rect.center(),
         egui::Align2::CENTER_CENTER,
         label,
-        poppins_sm(),
+        noto_sans_bold(FONT_SM),
         text,
     );
     if enabled && response.hovered() {
@@ -284,7 +284,7 @@ fn stat_pill(
 ) -> f32 {
     let text_size = ui
         .painter()
-        .layout_no_wrap(value.to_string(), poppins_xs(), TEXT_WHITE)
+        .layout_no_wrap(value.to_string(), noto_sans_regular(FONT_XS), TEXT_WHITE)
         .size();
     let width = text_size.x + 34.0;
     let rect = Rect::from_center_size(
@@ -297,7 +297,7 @@ fn stat_pill(
         Pos2::new(rect.left() + 6.0, rect.center().y),
         egui::Align2::LEFT_CENTER,
         value,
-        poppins_xs(),
+        noto_sans_regular(FONT_XS),
         TEXT_WHITE,
     );
     icon(

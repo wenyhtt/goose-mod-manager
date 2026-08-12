@@ -1,4 +1,5 @@
-use eframe::egui::{FontData, FontDefinitions, FontFamily};
+use eframe::egui::epaint::text::VariationCoords;
+use eframe::egui::{FontData, FontDefinitions, FontFamily, FontTweak};
 use std::sync::Arc;
 
 mod app;
@@ -10,6 +11,11 @@ mod theme;
 mod ui;
 
 use app::GooseModManager;
+use theme::{
+    FONT_WEIGHT_AXIS, FONT_WEIGHT_BOLD, FONT_WEIGHT_LIGHT, FONT_WEIGHT_REGULAR, NOTO_SANS_BOLD,
+    NOTO_SANS_BOLD_FACE, NOTO_SANS_LIGHT, NOTO_SANS_LIGHT_FACE, NOTO_SANS_REGULAR,
+    NOTO_SANS_REGULAR_FACE,
+};
 
 // ── Entry point ──────────────────────────────────────────────────────────────
 fn main() -> eframe::Result<()> {
@@ -29,30 +35,40 @@ fn main() -> eframe::Result<()> {
         Box::new(|cc| {
             let mut fonts = FontDefinitions::default();
 
-            fonts.font_data.insert(
-                "Poppins-Medium".to_owned(),
-                Arc::new(FontData::from_static(include_bytes!(
-                    "../assets/fonts/Poppins-Medium.ttf"
-                ))),
-            );
+            for (name, weight) in [
+                (NOTO_SANS_LIGHT_FACE, FONT_WEIGHT_LIGHT),
+                (NOTO_SANS_REGULAR_FACE, FONT_WEIGHT_REGULAR),
+                (NOTO_SANS_BOLD_FACE, FONT_WEIGHT_BOLD),
+            ] {
+                fonts.font_data.insert(
+                    name.to_owned(),
+                    Arc::new(
+                        FontData::from_static(include_bytes!(
+                            "../assets/fonts/NotoSans-Variable.ttf"
+                        ))
+                        .tweak(FontTweak {
+                            coords: VariationCoords::new([(FONT_WEIGHT_AXIS, weight)]),
+                            ..Default::default()
+                        }),
+                    ),
+                );
+            }
 
-            fonts.font_data.insert(
-                "Poppins-Regular".to_owned(),
-                Arc::new(FontData::from_static(include_bytes!(
-                    "../assets/fonts/Poppins-Regular.ttf"
-                ))),
-            );
-
-            fonts.families.insert(
-                FontFamily::Name("Poppins".into()),
-                vec!["Poppins-Medium".to_owned(), "Poppins-Regular".to_owned()],
-            );
+            for (family, font) in [
+                (NOTO_SANS_LIGHT, NOTO_SANS_LIGHT_FACE),
+                (NOTO_SANS_REGULAR, NOTO_SANS_REGULAR_FACE),
+                (NOTO_SANS_BOLD, NOTO_SANS_BOLD_FACE),
+            ] {
+                fonts
+                    .families
+                    .insert(FontFamily::Name(family.into()), vec![font.to_owned()]);
+            }
 
             fonts
                 .families
                 .get_mut(&FontFamily::Proportional)
                 .unwrap()
-                .insert(0, "Poppins-Regular".to_owned());
+                .insert(0, NOTO_SANS_REGULAR_FACE.to_owned());
 
             cc.egui_ctx.set_fonts(fonts);
 
