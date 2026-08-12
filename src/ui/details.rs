@@ -68,14 +68,23 @@ pub fn render_details(app: &mut GooseModManager, ctx: &egui::Context) {
 }
 
 fn paint_header(ui: &mut egui::Ui, mod_entry: &ModEntry, rect: Rect) {
-    ui.put(
-        Rect::from_min_size(rect.min, Vec2::new(rect.width() - 180.0, 30.0)),
-        egui::Label::new(
-            egui::RichText::new(&mod_entry.name)
-                .font(poppins())
-                .color(TEXT_WHITE),
-        )
-        .truncate(),
+    ui.scope_builder(
+        egui::UiBuilder::new()
+            .max_rect(Rect::from_min_size(
+                rect.min,
+                Vec2::new(rect.width() - 180.0, 30.0),
+            ))
+            .layout(egui::Layout::top_down(egui::Align::LEFT)),
+        |ui| {
+            ui.add(
+                egui::Label::new(
+                    egui::RichText::new(&mod_entry.name)
+                        .font(poppins())
+                        .color(TEXT_WHITE),
+                )
+                .truncate(),
+            );
+        },
     );
 
     if !mod_entry.author.is_empty() {
